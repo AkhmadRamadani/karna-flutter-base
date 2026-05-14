@@ -636,9 +636,54 @@
 
         <div class="content">
 
-            <!-- 01 PRINCIPLES -->
-            <div class="section" id="principles">
+            <!-- 01 STRUCTURE -->
+            <div class="section" id="structure">
                 <div class="section-header"><span class="section-num">01</span>
+                    <h2>Folder Structure</h2>
+                </div>
+                <div class="tree">
+                    <pre style="margin:0;background:transparent;border:none;padding:0;"><code style="line-height:1.9;"><span style="color:var(--muted)">lib/</span>
+<span style="color:var(--muted)">├── main.dart</span>
+<span style="color:var(--accent)">├── core/</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">config/</span>app_config.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">controller/</span>base_controller.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">di/</span>providers.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">errors/</span>app_exception.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">events/</span>event_bus.dart · app_events.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">network/</span></span>
+<span style="color:var(--muted)">│   │   ├── api_client.dart</span>
+<span style="color:var(--muted)">│   │   ├── connectivity_checker.dart</span>
+<span style="color:var(--muted)">│   │   └── data_strategy.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">result/</span>result.dart</span>
+<span style="color:var(--muted)">│   ├── <span style="color:var(--accent2)">storage/</span></span>
+<span style="color:var(--muted)">│   │   ├── local_storage.dart</span>
+<span style="color:var(--muted)">│   │   ├── hive_storage.dart <span style="color:var(--accent3)">(or)</span> shared_prefs_storage.dart</span>
+<span style="color:var(--muted)">│   │   └── in_memory_storage.dart</span>
+<span style="color:var(--muted)">│   └── <span style="color:var(--accent2)">widgets/</span>error_display.dart · loading_indicator.dart</span>
+<span style="color:var(--accent3)">├── features/</span>
+<span style="color:var(--muted)">│   └── <span style="color:var(--accent3)">&lt;feature&gt;/</span></span>
+<span style="color:var(--muted)">│       ├── <span style="color:var(--accent2)">model/</span>&lt;feature&gt;_model.dart</span>
+<span style="color:var(--muted)">│       ├── <span style="color:var(--accent2)">repository/</span></span>
+<span style="color:var(--muted)">│       │   ├── &lt;feature&gt;_repository.dart</span>
+<span style="color:var(--muted)">│       │   ├── &lt;feature&gt;_repository_impl.dart</span>
+<span style="color:var(--muted)">│       │   └── <span style="color:var(--accent2)">data_source/</span></span>
+<span style="color:var(--muted)">│       │       ├── &lt;feature&gt;_remote_source.dart</span>
+<span style="color:var(--muted)">│       │       └── &lt;feature&gt;_local_source.dart</span>
+<span style="color:var(--muted)">│       ├── <span style="color:var(--accent2)">controller/</span>&lt;feature&gt;_controller.dart</span>
+<span style="color:var(--muted)">│       └── <span style="color:var(--accent2)">view/</span></span>
+<span style="color:var(--muted)">│           ├── &lt;feature&gt;_view.dart</span>
+<span style="color:var(--muted)">│           └── <span style="color:var(--accent2)">widgets/</span></span>
+<span style="color:var(--muted)">test/</span>
+<span style="color:var(--muted)">└── <span style="color:var(--accent2)">features/</span>&lt;feature&gt;/</span>
+<span style="color:var(--muted)">    ├── &lt;feature&gt;_controller_test.dart</span>
+<span style="color:var(--muted)">    ├── &lt;feature&gt;_repository_test.dart</span>
+<span style="color:var(--muted)">    └── &lt;feature&gt;_view_test.dart</span></code></pre>
+                </div>
+            </div>
+
+            <!-- 02 PRINCIPLES -->
+            <div class="section" id="principles">
+                <div class="section-header"><span class="section-num">02</span>
                     <h2 data-i18n="s01_h">Prinsip Utama</h2>
                 </div>
                 <div class="principles">
@@ -673,51 +718,6 @@
                         <p class="principle-desc" data-i18n="p6d">Typed <code>EventBus</code> mengaktifkan komunikasi
                             lintas-fitur tanpa coupling.</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- 02 STRUCTURE -->
-            <div class="section" id="structure">
-                <div class="section-header"><span class="section-num">02</span>
-                    <h2>Folder Structure</h2>
-                </div>
-                <div class="tree">
-                    <span style="color:var(--muted)">lib/</span>
-                    <span style="color:var(--muted)">├── main.dart</span>
-                    <span style="color:var(--accent)">├── core/</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">config/</span>
-                        app_config.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">controller/</span>
-                        base_controller.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">di/</span>
-                        providers.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">errors/</span>
-                        app_exception.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">events/</span>
-                        event_bus.dart · app_events.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">network/</span>
-                        api_client.dart · connectivity_checker.dart · data_strategy.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">result/</span>
-                        result.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">storage/</span>
-                        local_storage.dart · hive_storage.dart · shared_prefs_storage.dart</span>
-                    <span style="color:var(--muted)">│ └── <span style="color:var(--accent2)">widgets/</span>
-                        error_display.dart · loading_indicator.dart</span>
-                    <span style="color:var(--accent3)">├── features/</span>
-                    <span style="color:var(--muted)">│ └── <span
-                            style="color:var(--accent3)">&lt;feature&gt;/</span></span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">model/</span>
-                        &lt;feature&gt;_model.dart</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">repository/</span>
-                        abstract · impl · data_source/</span>
-                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">controller/</span>
-                        &lt;feature&gt;_controller.dart</span>
-                    <span style="color:var(--muted)">│ └── <span style="color:var(--accent2)">view/</span>
-                        &lt;feature&gt;_view.dart · widgets/</span>
-                    <span style="color:var(--muted)">test/</span>
-                    <span style="color:var(--muted)">└── <span
-                            style="color:var(--accent2)">features/</span>&lt;feature&gt;/ controller · repository ·
-                        view</span>
                 </div>
             </div>
 
@@ -996,7 +996,8 @@ _sub = _eventBus.<span class="fn">on</span>&lt;<span class="type">UserLoggedOutE
                     <h2>Feature: Model</h2>
                 </div>
                 <p data-i18n="s10p">Pure Dart classes. Tidak ada Flutter dependency. Field immutable, memiliki
-                    <code>fromJson</code>, <code>toJson</code>, dan <code>copyWith</code>.</p>
+                    <code>fromJson</code>, <code>toJson</code>, dan <code>copyWith</code>.
+                </p>
                 <pre><code><span class="kw">class</span> <span class="type">UserModel</span> {
   <span class="kw">final</span> <span class="type">String</span> id, name, email;
   <span class="kw">const</span> <span class="type">UserModel</span>({<span class="kw">required this</span>.id, <span class="kw">required this</span>.name, <span class="kw">required this</span>.email});
@@ -1081,7 +1082,8 @@ _sub = _eventBus.<span class="fn">on</span>&lt;<span class="type">UserLoggedOutE
                 </div>
                 <p data-i18n="s14p"><code>core/di/providers.dart</code> adalah <strong>satu-satunya file</strong> yang
                     mengimport lintas fitur. Menerima <code>LocalStorage</code> sebagai parameter dari
-                    <code>main()</code>.</p>
+                    <code>main()</code>.
+                </p>
                 <pre><code><span class="type">List</span>&lt;<span class="type">SingleChildWidget</span>&gt; <span class="fn">appProviders</span>({<span class="kw">required</span> <span class="type">LocalStorage</span> storage}) =&gt; [
   <span class="cm" data-i18n="di1">// Core singletons</span>
   <span class="type">Provider</span>&lt;<span class="type">AppConfig</span>&gt;(create: (_) =&gt; <span class="type">AppConfig</span>.<span class="fn">fromEnvironment</span>()),
@@ -1105,7 +1107,8 @@ _sub = _eventBus.<span class="fn">on</span>&lt;<span class="type">UserLoggedOutE
                     <h2>Testing Strategy</h2>
                 </div>
                 <p data-i18n="s15p">Tests mencerminkan struktur <code>features/</code> secara persis. Gunakan
-                    <code>InMemoryStorage</code> — tidak perlu Hive atau SharedPrefs.</p>
+                    <code>InMemoryStorage</code> — tidak perlu Hive atau SharedPrefs.
+                </p>
                 <pre><code><span class="cm" data-i18n="t1">// Controller test</span>
 test(<span class="str" data-i18n="t1s">'localFirst menampilkan cached data'</span>, () <span class="kw">async</span> {
   mockRepo.cacheResult = <span class="type">Success</span>(fakeUser);
@@ -1131,15 +1134,19 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                     <li data-i18n="cl1">Buat <code>lib/features/&lt;feature&gt;/model/&lt;name&gt;_model.dart</code>
                     </li>
                     <li data-i18n="cl2">Buat <code>repository/&lt;name&gt;_repository.dart</code> (abstract, returns
-                        <code>Result&lt;T&gt;</code>)</li>
+                        <code>Result&lt;T&gt;</code>)
+                    </li>
                     <li data-i18n="cl3">Buat <code>repository/&lt;name&gt;_repository_impl.dart</code> (orchestrate
                         local + connectivity)</li>
                     <li data-i18n="cl4">Buat <code>data_source/&lt;name&gt;_remote_source.dart</code> (gunakan
-                        <code>ApiClient</code>)</li>
+                        <code>ApiClient</code>)
+                    </li>
                     <li data-i18n="cl5">Buat <code>data_source/&lt;name&gt;_local_source.dart</code> (gunakan
-                        <code>LocalStorage</code>)</li>
+                        <code>LocalStorage</code>)
+                    </li>
                     <li data-i18n="cl6">Buat <code>controller/&lt;name&gt;_controller.dart</code> (extends
-                        <code>BaseController</code>)</li>
+                        <code>BaseController</code>)
+                    </li>
                     <li data-i18n="cl7">Buat <code>view/&lt;name&gt;_view.dart</code></li>
                     <li data-i18n="cl8">Daftarkan controller di <code>core/di/providers.dart</code></li>
                     <li data-i18n="cl9">Buat <code>test/features/&lt;feature&gt;/</code> — controller, repository,
@@ -1178,11 +1185,11 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                             <td>http</td>
                             <td data-i18n="pk2">HTTP client (digunakan oleh ApiClient)</td>
                         </tr>
-                        <tr>
+                        <tr style="border-left: 2px solid var(--accent);">
                             <td>hive / hive_flutter</td>
                             <td data-i18n="pk3">Fast local storage backend</td>
                         </tr>
-                        <tr>
+                        <tr style="border-left: 2px solid var(--accent);">
                             <td>shared_preferences</td>
                             <td data-i18n="pk4">Simple key-value storage backend</td>
                         </tr>
@@ -1192,6 +1199,9 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                         </tr>
                     </tbody>
                 </table>
+                <p style="font-size:12px;color:var(--accent);margin-top:0.5rem;" data-i18n="pk_note">⚠ Pilih salah satu:
+                    <code>hive</code> untuk dataset besar/offline-first, atau <code>shared_preferences</code> untuk
+                    key-value sederhana. Tidak perlu keduanya.</p>
             </div>
 
         </div>
@@ -1269,6 +1279,7 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                 th_role: 'Peran',
                 pk1: 'DI + state propagation ke widget tree', pk2: 'HTTP client (digunakan oleh ApiClient)',
                 pk3: 'Fast local storage backend', pk4: 'Simple key-value storage backend', pk5: 'Widget dan unit testing',
+                pk_note: '⚠ Pilih salah satu: <code>hive</code> untuk dataset besar/offline-first, atau <code>shared_preferences</code> untuk key-value sederhana. Tidak perlu keduanya.',
                 footer: 'karena setiap layer ada karena fiturnya',
             },
             en: {
@@ -1335,6 +1346,7 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                 th_role: 'Role',
                 pk1: 'DI + state propagation to the widget tree', pk2: 'HTTP client (used by ApiClient)',
                 pk3: 'Fast local storage backend', pk4: 'Simple key-value storage backend', pk5: 'Widget and unit testing',
+                pk_note: '⚠ Choose one: <code>hive</code> for large datasets/offline-first, or <code>shared_preferences</code> for simple key-value. You don\'t need both.',
                 footer: 'every layer exists because of its feature',
             }
         };
@@ -1363,7 +1375,7 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
 
         // Active nav on scroll
         const allNavLinks = document.querySelectorAll('.nav-link');
-        const ids = ['overview', 'principles', 'structure', 'result', 'exceptions', 'strategy', 'controller', 'api', 'storage', 'events', 'model', 'repository', 'fcontroller', 'view', 'di', 'testing', 'checklist', 'packages'];
+        const ids = ['overview', 'structure', 'principles', 'result', 'exceptions', 'strategy', 'controller', 'api', 'storage', 'events', 'model', 'repository', 'fcontroller', 'view', 'di', 'testing', 'checklist', 'packages'];
         const observer = new IntersectionObserver(entries => {
             entries.forEach(e => {
                 if (e.isIntersecting) {
