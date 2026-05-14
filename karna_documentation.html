@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karna MVC — Flutter Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0e0f11;
+            --bg2: #16181c;
+            --bg3: #1e2028;
+            --border: rgba(255, 255, 255, 0.07);
+            --border2: rgba(255, 255, 255, 0.12);
+            --text: #e8e6e0;
+            --muted: #7c7b75;
+            --accent: #c9a96e;
+            --accent2: #7fa7c9;
+            --accent3: #8fbe99;
+            --red: #c9706e;
+            --tag-bg: rgba(201, 169, 110, 0.1);
+            --tag-border: rgba(201, 169, 110, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+            line-height: 1.75;
+            font-size: 15px;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0 1.5rem 1.5rem;
+            padding: 4px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 5px 0;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: #1a1408;
+            font-weight: 500;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-logo .wordmark {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: var(--accent);
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-logo .sub {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .nav-section {
+            padding: 0 1rem 1rem;
+        }
+
+        .nav-section-title {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 5px;
+            transition: all 0.15s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+        }
+
+        .nav-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--border2);
+            flex-shrink: 0;
+        }
+
+        .nav-link.active .nav-dot {
+            background: var(--accent);
+        }
+
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+        .hero {
+            padding: 5rem 4rem 4rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--tag-bg);
+            border: 1px solid var(--tag-border);
+            color: var(--accent);
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 3px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.15;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-quote {
+            max-width: 640px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+            border-left: 2px solid var(--accent);
+            padding-left: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .hero-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 2rem;
+        }
+
+        .pill {
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            border: 1px solid var(--border2);
+            color: var(--muted);
+        }
+
+        .pill.gold {
+            border-color: var(--tag-border);
+            color: var(--accent);
+            background: var(--tag-bg);
+        }
+
+        .pill.blue {
+            border-color: rgba(127, 167, 201, 0.25);
+            color: var(--accent2);
+            background: rgba(127, 167, 201, 0.08);
+        }
+
+        .pill.green {
+            border-color: rgba(143, 190, 153, 0.25);
+            color: var(--accent3);
+            background: rgba(143, 190, 153, 0.08);
+        }
+
+        .content {
+            max-width: 800px;
+            padding: 3rem 4rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .section h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem;
+            color: var(--text);
+            font-weight: 400;
+        }
+
+        .section h3 {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 2rem 0 0.75rem;
+        }
+
+        p {
+            color: var(--muted);
+            margin-bottom: 1rem;
+            font-size: 14px;
+        }
+
+        strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .principles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .principle {
+            background: var(--bg2);
+            padding: 1.25rem;
+        }
+
+        .principle-icon {
+            font-size: 18px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .principle-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .principle-desc {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .tree {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+            line-height: 2;
+            overflow-x: auto;
+        }
+
+        pre {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.9;
+        }
+
+        .kw {
+            color: #c9a96e;
+        }
+
+        .type {
+            color: #7fa7c9;
+        }
+
+        .str {
+            color: #8fbe99;
+        }
+
+        .cm {
+            color: #4a4e56;
+        }
+
+        .fn {
+            color: #c9706e;
+        }
+
+        p code,
+        li code,
+        td code {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            background: var(--bg3);
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 400;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        td:first-child {
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .strat-table th:not(:first-child),
+        .strat-table td:not(:first-child) {
+            text-align: center;
+        }
+
+        .err {
+            color: var(--red);
+        }
+
+        .checklist,
+        .never-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 1rem 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            padding: 8px 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .checklist li::before {
+            content: '□';
+            color: var(--accent);
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .never-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            padding: 8px 12px;
+            background: rgba(201, 112, 110, 0.05);
+            border: 1px solid rgba(201, 112, 110, 0.15);
+            border-radius: 6px;
+        }
+
+        .never-list li::before {
+            content: '✕';
+            color: var(--red);
+            flex-shrink: 0;
+        }
+
+        .event-tag {
+            display: inline-block;
+            background: rgba(127, 167, 201, 0.1);
+            border: 1px solid rgba(127, 167, 201, 0.2);
+            color: var(--accent2);
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 3rem 0;
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 4rem;
+            color: var(--muted);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-brand {
+            font-family: 'DM Serif Display', serif;
+            color: var(--accent);
+        }
+
+        [data-i18n] {
+            transition: opacity 0.12s ease;
+        }
+
+        .fading {
+            opacity: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .hero,
+            .content {
+                padding: 2rem 1.5rem;
+            }
+
+            .principles {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="wordmark">Karna MVC</div>
+            <div class="sub">Flutter Architecture</div>
+        </div>
+
+        <div class="lang-toggle">
+            <button class="lang-btn active" onclick="setLang('id')">🇮🇩 Indo</button>
+            <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title" data-i18n="nav_s1">Overview</div>
+            <a class="nav-link active" onclick="goTo('overview')"><span class="nav-dot"></span><span
+                    data-i18n="nav_intro">Pengantar</span></a>
+            <a class="nav-link" onclick="goTo('structure')"><span class="nav-dot"></span>Folder Structure</a>
+            <a class="nav-link" onclick="goTo('principles')"><span class="nav-dot"></span><span
+                    data-i18n="nav_principles">Prinsip Utama</span></a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Core Layer</div>
+            <a class="nav-link" onclick="goTo('result')"><span class="nav-dot"></span>Result&lt;T&gt;</a>
+            <a class="nav-link" onclick="goTo('exceptions')"><span class="nav-dot"></span>App Exceptions</a>
+            <a class="nav-link" onclick="goTo('strategy')"><span class="nav-dot"></span>Data Strategy</a>
+            <a class="nav-link" onclick="goTo('controller')"><span class="nav-dot"></span>BaseController</a>
+            <a class="nav-link" onclick="goTo('api')"><span class="nav-dot"></span>ApiClient</a>
+            <a class="nav-link" onclick="goTo('storage')"><span class="nav-dot"></span>LocalStorage</a>
+            <a class="nav-link" onclick="goTo('events')"><span class="nav-dot"></span>EventBus</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Feature Layer</div>
+            <a class="nav-link" onclick="goTo('model')"><span class="nav-dot"></span>Model</a>
+            <a class="nav-link" onclick="goTo('repository')"><span class="nav-dot"></span>Repository</a>
+            <a class="nav-link" onclick="goTo('fcontroller')"><span class="nav-dot"></span>Controller</a>
+            <a class="nav-link" onclick="goTo('view')"><span class="nav-dot"></span>View</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title" data-i18n="nav_s4">Panduan</div>
+            <a class="nav-link" onclick="goTo('di')"><span class="nav-dot"></span>DI / Providers</a>
+            <a class="nav-link" onclick="goTo('testing')"><span class="nav-dot"></span>Testing</a>
+            <a class="nav-link" onclick="goTo('checklist')"><span class="nav-dot"></span><span
+                    data-i18n="nav_newfeature">Feature Baru</span></a>
+            <a class="nav-link" onclick="goTo('packages')"><span class="nav-dot"></span>Packages</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="hero" id="overview">
+            <div class="hero-tag">⚔ Flutter Architecture</div>
+            <h1>Karna <em>MVC</em></h1>
+            <div class="hero-quote" data-i18n="hero_quote">Dinamai dari Karna dalam Mahabharata — seorang ksatria yang
+                sempurna dalam dirinya sendiri, tidak membutuhkan apapun dari luar — namun berjuang untuk keseluruhan
+                yang lebih besar. Dalam Bahasa Indonesia: <em>karena</em> — setiap layer ada <em>karena</em> fiturnya.
+            </div>
+            <div class="hero-pills">
+                <span class="pill gold">Feature-First</span><span class="pill gold">Result&lt;T&gt;</span>
+                <span class="pill blue">DataStrategy</span><span class="pill blue">EventBus</span>
+                <span class="pill green">Storage-Agnostic</span><span class="pill green">Zero Boilerplate</span>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- 01 PRINCIPLES -->
+            <div class="section" id="principles">
+                <div class="section-header"><span class="section-num">01</span>
+                    <h2 data-i18n="s01_h">Prinsip Utama</h2>
+                </div>
+                <div class="principles">
+                    <div class="principle"><span class="principle-icon">🛡</span>
+                        <div class="principle-title" data-i18n="p1t">Typed Error Handling</div>
+                        <p class="principle-desc" data-i18n="p1d">Repository mengembalikan <code>Result&lt;T&gt;</code>
+                            (sealed Success/Failure), tidak pernah throw exception.</p>
+                    </div>
+                    <div class="principle"><span class="principle-icon">⚡</span>
+                        <div class="principle-title">Data Strategy</div>
+                        <p class="principle-desc" data-i18n="p2d">Setiap load call mendeklarasikan strategi:
+                            <code>localFirst</code>, <code>staleWhileRevalidate</code>, atau <code>remoteFirst</code>.
+                        </p>
+                    </div>
+                    <div class="principle"><span class="principle-icon">🗄</span>
+                        <div class="principle-title">Storage-Agnostic</div>
+                        <p class="principle-desc" data-i18n="p3d">Interface <code>LocalStorage</code> tunggal sebagai
+                            backing semua cache (Hive, SharedPrefs, InMemory).</p>
+                    </div>
+                    <div class="principle"><span class="principle-icon">📡</span>
+                        <div class="principle-title">Connectivity-Aware</div>
+                        <p class="principle-desc" data-i18n="p4d">Repository memeriksa jaringan sebelum remote call,
+                            mengembalikan typed failures saat offline.</p>
+                    </div>
+                    <div class="principle"><span class="principle-icon">🔧</span>
+                        <div class="principle-title">Zero Boilerplate</div>
+                        <p class="principle-desc" data-i18n="p5d"><code>BaseController</code> mengelola
+                            loading/error/refresh state untuk semua controller.</p>
+                    </div>
+                    <div class="principle"><span class="principle-icon">📨</span>
+                        <div class="principle-title">Event-Driven</div>
+                        <p class="principle-desc" data-i18n="p6d">Typed <code>EventBus</code> mengaktifkan komunikasi
+                            lintas-fitur tanpa coupling.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 02 STRUCTURE -->
+            <div class="section" id="structure">
+                <div class="section-header"><span class="section-num">02</span>
+                    <h2>Folder Structure</h2>
+                </div>
+                <div class="tree">
+                    <span style="color:var(--muted)">lib/</span>
+                    <span style="color:var(--muted)">├── main.dart</span>
+                    <span style="color:var(--accent)">├── core/</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">config/</span>
+                        app_config.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">controller/</span>
+                        base_controller.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">di/</span>
+                        providers.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">errors/</span>
+                        app_exception.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">events/</span>
+                        event_bus.dart · app_events.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">network/</span>
+                        api_client.dart · connectivity_checker.dart · data_strategy.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">result/</span>
+                        result.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">storage/</span>
+                        local_storage.dart · hive_storage.dart · shared_prefs_storage.dart</span>
+                    <span style="color:var(--muted)">│ └── <span style="color:var(--accent2)">widgets/</span>
+                        error_display.dart · loading_indicator.dart</span>
+                    <span style="color:var(--accent3)">├── features/</span>
+                    <span style="color:var(--muted)">│ └── <span
+                            style="color:var(--accent3)">&lt;feature&gt;/</span></span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">model/</span>
+                        &lt;feature&gt;_model.dart</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">repository/</span>
+                        abstract · impl · data_source/</span>
+                    <span style="color:var(--muted)">│ ├── <span style="color:var(--accent2)">controller/</span>
+                        &lt;feature&gt;_controller.dart</span>
+                    <span style="color:var(--muted)">│ └── <span style="color:var(--accent2)">view/</span>
+                        &lt;feature&gt;_view.dart · widgets/</span>
+                    <span style="color:var(--muted)">test/</span>
+                    <span style="color:var(--muted)">└── <span
+                            style="color:var(--accent2)">features/</span>&lt;feature&gt;/ controller · repository ·
+                        view</span>
+                </div>
+            </div>
+
+            <!-- 03 RESULT -->
+            <div class="section" id="result">
+                <div class="section-header"><span class="section-num">03</span>
+                    <h2>Result&lt;T&gt;</h2>
+                </div>
+                <p data-i18n="s03p">Sealed type yang memaksa error handling eksplisit. Repository <strong>tidak pernah
+                        throw</strong> — selalu mengembalikan <code>Result&lt;T&gt;</code>.</p>
+                <pre><code><span class="kw">sealed class</span> <span class="type">Result</span>&lt;<span class="type">T</span>&gt; {
+  <span class="type">R</span> when&lt;<span class="type">R</span>&gt;({
+    <span class="kw">required</span> <span class="type">R</span> <span class="type">Function</span>(<span class="type">T</span> data) success,
+    <span class="kw">required</span> <span class="type">R</span> <span class="type">Function</span>(<span class="type">AppException</span> error) failure,
+  });
+}
+<span class="kw">class</span> <span class="type">Success</span>&lt;<span class="type">T</span>&gt; <span class="kw">extends</span> <span class="type">Result</span>&lt;<span class="type">T</span>&gt; { <span class="kw">final</span> <span class="type">T</span> value; }
+<span class="kw">class</span> <span class="type">Failure</span>&lt;<span class="type">T</span>&gt; <span class="kw">extends</span> <span class="type">Result</span>&lt;<span class="type">T</span>&gt; { <span class="kw">final</span> <span class="type">AppException</span> error; }</code></pre>
+            </div>
+
+            <!-- 04 EXCEPTIONS -->
+            <div class="section" id="exceptions">
+                <div class="section-header"><span class="section-num">04</span>
+                    <h2>App Exceptions</h2>
+                </div>
+                <p data-i18n="s04p">Typed exceptions memungkinkan UI bereaksi berbeda untuk setiap jenis kegagalan.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th data-i18n="th_desc">Keterangan</th>
+                            <th data-i18n="th_fields">Field Tambahan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AppException</td>
+                            <td data-i18n="ex1">Base class semua exception</td>
+                            <td><code>message</code>, <code>code?</code></td>
+                        </tr>
+                        <tr>
+                            <td>NetworkException</td>
+                            <td data-i18n="ex2">Tidak ada koneksi internet</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>ServerException</td>
+                            <td data-i18n="ex3">4xx / 5xx dari server</td>
+                            <td><code>statusCode</code></td>
+                        </tr>
+                        <tr>
+                            <td>CacheException</td>
+                            <td data-i18n="ex4">Kegagalan local storage</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 05 STRATEGY -->
+            <div class="section" id="strategy">
+                <div class="section-header"><span class="section-num">05</span>
+                    <h2>Data Strategy</h2>
+                </div>
+                <p data-i18n="s05p">Setiap controller mendeklarasikan bagaimana data diselesaikan antara lokal dan
+                    remote.</p>
+                <pre><code><span class="kw">enum</span> <span class="type">DataStrategy</span> {
+  <span class="cm" data-i18n="cm_lf">/// Cache dulu, network hanya jika miss. Cocok: data jarang berubah.</span>
+  localFirst,
+  <span class="cm" data-i18n="cm_swr">/// Tampilkan cache, refresh dari network di background. Cocok: feeds, dashboard.</span>
+  staleWhileRevalidate,
+  <span class="cm" data-i18n="cm_rf">/// Selalu hit network, fallback ke cache jika gagal. Cocok: data real-time.</span>
+  remoteFirst,
+}</code></pre>
+                <h3 data-i18n="matrix_h">Matriks Perilaku</h3>
+                <table class="strat-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_scenario">Skenario</th>
+                            <th>localFirst</th>
+                            <th>staleWhileRevalidate</th>
+                            <th>remoteFirst</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-i18n="sc1">Cache hit, network ok</td>
+                            <td>Cache ✓</td>
+                            <td data-i18n="sc1swr">Cache → Fresh</td>
+                            <td>Fresh ✓</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="sc2">Cache hit, network fail</td>
+                            <td>Cache ✓</td>
+                            <td data-i18n="sc2swr">Cache, silent fail</td>
+                            <td data-i18n="sc2rf">Fallback Cache</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="sc3">Cache miss, network ok</td>
+                            <td>Fresh ✓</td>
+                            <td>Fresh ✓</td>
+                            <td>Fresh ✓</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="sc4">Cache miss, network fail</td>
+                            <td class="err">Error</td>
+                            <td class="err">Error</td>
+                            <td class="err">Error</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 06 BASE CONTROLLER -->
+            <div class="section" id="controller">
+                <div class="section-header"><span class="section-num">06</span>
+                    <h2>BaseController</h2>
+                </div>
+                <p data-i18n="s06p">Semua controller extend class ini. Menyediakan loading/error/refresh state secara
+                    otomatis.</p>
+                <pre><code><span class="kw">abstract class</span> <span class="type">BaseController</span> <span class="kw">extends</span> <span class="type">ChangeNotifier</span> {
+  <span class="kw">bool</span> isLoading;    <span class="cm" data-i18n="bc1">// true saat initial load</span>
+  <span class="kw">bool</span> isRefreshing; <span class="cm" data-i18n="bc2">// true saat background refresh</span>
+  <span class="kw">bool</span> hasError;
+  <span class="type">AppException</span>? error;
+  <span class="type">String</span>? errorMessage;
+
+  <span class="type">Future</span>&lt;<span class="kw">void</span>&gt; <span class="fn">load</span>&lt;<span class="type">T</span>&gt;({
+    <span class="kw">required</span> <span class="type">DataStrategy</span> strategy,
+    <span class="kw">required</span> <span class="type">Future</span>&lt;<span class="type">Result</span>&lt;<span class="type">T</span>&gt;&gt; <span class="type">Function</span>() cacheAction,
+    <span class="kw">required</span> <span class="type">Future</span>&lt;<span class="type">Result</span>&lt;<span class="type">T</span>&gt;&gt; <span class="type">Function</span>() freshAction,
+    <span class="kw">required</span> <span class="kw">void</span> <span class="type">Function</span>(<span class="type">T</span> data) onSuccess,
+  });
+}</code></pre>
+            </div>
+
+            <!-- 07 API CLIENT -->
+            <div class="section" id="api">
+                <div class="section-header"><span class="section-num">07</span>
+                    <h2>ApiClient</h2>
+                </div>
+                <p data-i18n="s07p">HTTP wrapper tipis yang mengelola auth, retry, dan mapping error.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_feat">Fitur</th>
+                            <th data-i18n="th_detail">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base URL</td>
+                            <td data-i18n="api1">Dari <code>AppConfig</code> via <code>--dart-define</code></td>
+                        </tr>
+                        <tr>
+                            <td>Auth</td>
+                            <td data-i18n="api2"><code>setAuthToken(token)</code> — inject ke semua request</td>
+                        </tr>
+                        <tr>
+                            <td>Retry</td>
+                            <td data-i18n="api3">2x retry dengan backoff untuk transient failure</td>
+                        </tr>
+                        <tr>
+                            <td>Error mapping</td>
+                            <td data-i18n="api4">HTTP status → typed <code>AppException</code></td>
+                        </tr>
+                        <tr>
+                            <td>Methods</td>
+                            <td><code>get</code> · <code>post</code> · <code>put</code> · <code>delete</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 08 LOCAL STORAGE -->
+            <div class="section" id="storage">
+                <div class="section-header"><span class="section-num">08</span>
+                    <h2>LocalStorage</h2>
+                </div>
+                <p data-i18n="s08p">Interface storage-agnostic. Ganti implementasi di DI — semua fitur mengikuti
+                    otomatis.</p>
+                <pre><code><span class="kw">abstract class</span> <span class="type">LocalStorage</span> {
+  <span class="type">Future</span>&lt;<span class="type">Map</span>?&gt; <span class="fn">getJson</span>(<span class="type">String</span> key);
+  <span class="type">Future</span>&lt;<span class="type">List</span>&gt; <span class="fn">getJsonList</span>(<span class="type">String</span> key);
+  <span class="type">Future</span>&lt;<span class="kw">void</span>&gt; <span class="fn">putJson</span>(<span class="type">String</span> key, <span class="type">Map</span> value);
+  <span class="type">Future</span>&lt;<span class="kw">void</span>&gt; <span class="fn">remove</span>(<span class="type">String</span> key);
+  <span class="type">Future</span>&lt;<span class="kw">void</span>&gt; <span class="fn">removeByPrefix</span>(<span class="type">String</span> prefix);
+  <span class="type">Future</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">has</span>(<span class="type">String</span> key);
+}</code></pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_impl">Implementasi</th>
+                            <th>Backend</th>
+                            <th data-i18n="th_best">Terbaik untuk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>InMemoryStorage</td>
+                            <td>RAM</td>
+                            <td data-i18n="st1">Dev, tests, prototyping</td>
+                        </tr>
+                        <tr>
+                            <td>SharedPrefsStorage</td>
+                            <td>SharedPreferences</td>
+                            <td data-i18n="st2">Settings, key-value kecil</td>
+                        </tr>
+                        <tr>
+                            <td>HiveStorage</td>
+                            <td>Hive</td>
+                            <td data-i18n="st3">Dataset besar, offline-first</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 09 EVENT BUS -->
+            <div class="section" id="events">
+                <div class="section-header"><span class="section-num">09</span>
+                    <h2>EventBus</h2>
+                </div>
+                <p data-i18n="s09p">Sistem notifikasi typed app-wide untuk komunikasi lintas-fitur. Fitur tidak pernah
+                    mengimport satu sama lain.</p>
+                <pre><code><span class="cm" data-i18n="eb1">// Publish (dari controller atau repository)</span>
+eventBus.<span class="fn">fire</span>(<span class="type">UserLoggedOutEvent</span>());
+
+<span class="cm" data-i18n="eb2">// Subscribe (dalam controller)</span>
+_sub = _eventBus.<span class="fn">on</span>&lt;<span class="type">UserLoggedOutEvent</span>&gt;().<span class="fn">listen</span>((_) =&gt; <span class="fn">clearProfile</span>());
+
+<span class="cm" data-i18n="eb3">// Wajib cancel di dispose()</span>
+<span class="kw">@override</span>
+<span class="kw">void</span> <span class="fn">dispose</span>() { _sub.<span class="fn">cancel</span>(); <span class="kw">super</span>.<span class="fn">dispose</span>(); }</code></pre>
+                <h3 data-i18n="ev_h">Built-in Events</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th data-i18n="th_when">Kapan Difire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="event-tag">UserLoggedInEvent</span></td>
+                            <td data-i18n="ev1">User berhasil login</td>
+                        </tr>
+                        <tr>
+                            <td><span class="event-tag">UserLoggedOutEvent</span></td>
+                            <td data-i18n="ev2">User logout atau session dihapus</td>
+                        </tr>
+                        <tr>
+                            <td><span class="event-tag">SessionExpiredEvent</span></td>
+                            <td data-i18n="ev3">Auth token kedaluwarsa</td>
+                        </tr>
+                        <tr>
+                            <td><span class="event-tag">UserProfileUpdatedEvent</span></td>
+                            <td data-i18n="ev4">Data profil berubah</td>
+                        </tr>
+                        <tr>
+                            <td><span class="event-tag">ConnectivityChangedEvent</span></td>
+                            <td data-i18n="ev5">Status jaringan berubah</td>
+                        </tr>
+                        <tr>
+                            <td><span class="event-tag">CacheClearedEvent</span></td>
+                            <td data-i18n="ev6">Cache app-wide dihapus</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 10 MODEL -->
+            <div class="section" id="model">
+                <div class="section-header"><span class="section-num">10</span>
+                    <h2>Feature: Model</h2>
+                </div>
+                <p data-i18n="s10p">Pure Dart classes. Tidak ada Flutter dependency. Field immutable, memiliki
+                    <code>fromJson</code>, <code>toJson</code>, dan <code>copyWith</code>.</p>
+                <pre><code><span class="kw">class</span> <span class="type">UserModel</span> {
+  <span class="kw">final</span> <span class="type">String</span> id, name, email;
+  <span class="kw">const</span> <span class="type">UserModel</span>({<span class="kw">required this</span>.id, <span class="kw">required this</span>.name, <span class="kw">required this</span>.email});
+  <span class="kw">factory</span> <span class="type">UserModel</span>.<span class="fn">fromJson</span>(<span class="type">Map</span>&lt;<span class="type">String</span>, <span class="kw">dynamic</span>&gt; json) =&gt;
+    <span class="type">UserModel</span>(id: json[<span class="str">'id'</span>], name: json[<span class="str">'name'</span>], email: json[<span class="str">'email'</span>]);
+  <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="kw">dynamic</span>&gt; <span class="fn">toJson</span>() =&gt; {<span class="str">'id'</span>: id, <span class="str">'name'</span>: name, <span class="str">'email'</span>: email};
+  <span class="type">UserModel</span> <span class="fn">copyWith</span>({<span class="type">String</span>? id, <span class="type">String</span>? name, <span class="type">String</span>? email}) =&gt;
+    <span class="type">UserModel</span>(id: id ?? <span class="kw">this</span>.id, name: name ?? <span class="kw">this</span>.name, email: email ?? <span class="kw">this</span>.email);
+}</code></pre>
+            </div>
+
+            <!-- 11 REPOSITORY -->
+            <div class="section" id="repository">
+                <div class="section-header"><span class="section-num">11</span>
+                    <h2>Feature: Repository</h2>
+                </div>
+                <p data-i18n="s11p">Abstract interface mengembalikan <code>Result&lt;T&gt;</code>. Implementasi
+                    mengorkestrasikan local + remote dengan connectivity check.</p>
+                <pre><code><span class="cm" data-i18n="r1">// Abstract interface</span>
+<span class="kw">abstract class</span> <span class="type">AuthRepository</span> {
+  <span class="type">Future</span>&lt;<span class="type">Result</span>&lt;<span class="type">UserModel</span>&gt;&gt; <span class="fn">getUserFromCache</span>(<span class="type">String</span> id);
+  <span class="type">Future</span>&lt;<span class="type">Result</span>&lt;<span class="type">UserModel</span>&gt;&gt; <span class="fn">getUserFromRemote</span>(<span class="type">String</span> id);
+}
+
+<span class="cm" data-i18n="r2">// Connectivity check pattern</span>
+<span class="kw">if</span> (!<span class="kw">await</span> _connectivity.hasConnection) {
+  <span class="kw">return const</span> <span class="type">Failure</span>(<span class="type">NetworkException</span>(message: <span class="str">'No internet'</span>, code: <span class="str">'NO_CONNECTION'</span>));
+}</code></pre>
+            </div>
+
+            <!-- 12 FEATURE CONTROLLER -->
+            <div class="section" id="fcontroller">
+                <div class="section-header"><span class="section-num">12</span>
+                    <h2>Feature: Controller</h2>
+                </div>
+                <pre><code><span class="kw">class</span> <span class="type">AuthController</span> <span class="kw">extends</span> <span class="type">BaseController</span> {
+  <span class="kw">final</span> <span class="type">AuthRepository</span> _repository;
+  <span class="type">UserModel</span>? <span class="kw">get</span> user =&gt; _user;
+
+  <span class="type">Future</span>&lt;<span class="kw">void</span>&gt; <span class="fn">loadUser</span>(<span class="type">String</span> id, {
+    <span class="type">DataStrategy</span> strategy = <span class="type">DataStrategy</span>.localFirst,
+  }) <span class="kw">async</span> =&gt; <span class="fn">load</span>(
+    strategy: strategy,
+    cacheAction: () =&gt; _repository.<span class="fn">getUserFromCache</span>(id),
+    freshAction: () =&gt; _repository.<span class="fn">getUserFromRemote</span>(id),
+    onSuccess: (data) =&gt; _user = data,
+  );
+}</code></pre>
+            </div>
+
+            <!-- 13 VIEW -->
+            <div class="section" id="view">
+                <div class="section-header"><span class="section-num">13</span>
+                    <h2>Feature: View</h2>
+                </div>
+                <p data-i18n="s13p">Hanya UI logic. Baca state dari controller, panggil methods. Tidak ada business
+                    logic di sini.</p>
+                <pre><code><span class="kw">class</span> <span class="type">UserView</span> <span class="kw">extends</span> <span class="type">StatelessWidget</span> {
+  <span class="kw">@override</span>
+  <span class="type">Widget</span> <span class="fn">build</span>(<span class="type">BuildContext</span> context) {
+    <span class="kw">final</span> ctrl = context.<span class="fn">watch</span>&lt;<span class="type">AuthController</span>&gt;();
+    <span class="kw">if</span> (ctrl.isLoading) <span class="kw">return const</span> <span class="type">CircularProgressIndicator</span>();
+    <span class="kw">if</span> (ctrl.hasError) <span class="kw">return</span> <span class="type">Text</span>(ctrl.errorMessage ?? <span class="str">''</span>);
+    <span class="kw">return</span> <span class="type">Scaffold</span>(
+      appBar: <span class="type">AppBar</span>(
+        actions: [
+          <span class="kw">if</span> (ctrl.isRefreshing) <span class="cm" data-i18n="view_cm">// background refresh indicator</span>
+            <span class="kw">const</span> <span class="type">CircularProgressIndicator</span>(strokeWidth: 2),
+        ],
+      ),
+    );
+  }
+}</code></pre>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 14 DI -->
+            <div class="section" id="di">
+                <div class="section-header"><span class="section-num">14</span>
+                    <h2>Dependency Injection</h2>
+                </div>
+                <p data-i18n="s14p"><code>core/di/providers.dart</code> adalah <strong>satu-satunya file</strong> yang
+                    mengimport lintas fitur. Menerima <code>LocalStorage</code> sebagai parameter dari
+                    <code>main()</code>.</p>
+                <pre><code><span class="type">List</span>&lt;<span class="type">SingleChildWidget</span>&gt; <span class="fn">appProviders</span>({<span class="kw">required</span> <span class="type">LocalStorage</span> storage}) =&gt; [
+  <span class="cm" data-i18n="di1">// Core singletons</span>
+  <span class="type">Provider</span>&lt;<span class="type">AppConfig</span>&gt;(create: (_) =&gt; <span class="type">AppConfig</span>.<span class="fn">fromEnvironment</span>()),
+  <span class="type">Provider</span>&lt;<span class="type">LocalStorage</span>&gt;(create: (_) =&gt; storage),
+  <span class="cm" data-i18n="di2">// Feature controllers — wiring terjadi di sini</span>
+  <span class="type">ChangeNotifierProvider</span>&lt;<span class="type">AuthController</span>&gt;(
+    create: (ctx) =&gt; <span class="type">AuthController</span>(
+      repository: <span class="type">AuthRepositoryImpl</span>(
+        remoteSource: <span class="type">AuthRemoteSourceImpl</span>(client: ctx.<span class="fn">read</span>&lt;<span class="type">ApiClient</span>&gt;()),
+        localSource: <span class="type">AuthLocalSourceImpl</span>(storage: ctx.<span class="fn">read</span>&lt;<span class="type">LocalStorage</span>&gt;()),
+        connectivity: ctx.<span class="fn">read</span>&lt;<span class="type">ConnectivityChecker</span>&gt;(),
+      ),
+    ),
+  ),
+];</code></pre>
+            </div>
+
+            <!-- 15 TESTING -->
+            <div class="section" id="testing">
+                <div class="section-header"><span class="section-num">15</span>
+                    <h2>Testing Strategy</h2>
+                </div>
+                <p data-i18n="s15p">Tests mencerminkan struktur <code>features/</code> secara persis. Gunakan
+                    <code>InMemoryStorage</code> — tidak perlu Hive atau SharedPrefs.</p>
+                <pre><code><span class="cm" data-i18n="t1">// Controller test</span>
+test(<span class="str" data-i18n="t1s">'localFirst menampilkan cached data'</span>, () <span class="kw">async</span> {
+  mockRepo.cacheResult = <span class="type">Success</span>(fakeUser);
+  <span class="kw">await</span> controller.<span class="fn">loadUser</span>(<span class="str">'1'</span>);
+  expect(controller.user, equals(fakeUser));
+});
+
+<span class="cm" data-i18n="t2">// Repository test</span>
+test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</span>, () <span class="kw">async</span> {
+  mockConnectivity.isConnected = <span class="kw">false</span>;
+  <span class="kw">final</span> result = <span class="kw">await</span> repository.<span class="fn">getUserById</span>(<span class="str">'1'</span>);
+  expect(result.isFailure, isTrue);
+});</code></pre>
+            </div>
+
+            <!-- 16 CHECKLIST -->
+            <div class="section" id="checklist">
+                <div class="section-header"><span class="section-num">16</span>
+                    <h2 data-i18n="s16h">Menambah Feature Baru</h2>
+                </div>
+                <p data-i18n="s16p">Jalankan generator atau buat manual mengikuti urutan ini:</p>
+                <ul class="checklist">
+                    <li data-i18n="cl1">Buat <code>lib/features/&lt;feature&gt;/model/&lt;name&gt;_model.dart</code>
+                    </li>
+                    <li data-i18n="cl2">Buat <code>repository/&lt;name&gt;_repository.dart</code> (abstract, returns
+                        <code>Result&lt;T&gt;</code>)</li>
+                    <li data-i18n="cl3">Buat <code>repository/&lt;name&gt;_repository_impl.dart</code> (orchestrate
+                        local + connectivity)</li>
+                    <li data-i18n="cl4">Buat <code>data_source/&lt;name&gt;_remote_source.dart</code> (gunakan
+                        <code>ApiClient</code>)</li>
+                    <li data-i18n="cl5">Buat <code>data_source/&lt;name&gt;_local_source.dart</code> (gunakan
+                        <code>LocalStorage</code>)</li>
+                    <li data-i18n="cl6">Buat <code>controller/&lt;name&gt;_controller.dart</code> (extends
+                        <code>BaseController</code>)</li>
+                    <li data-i18n="cl7">Buat <code>view/&lt;name&gt;_view.dart</code></li>
+                    <li data-i18n="cl8">Daftarkan controller di <code>core/di/providers.dart</code></li>
+                    <li data-i18n="cl9">Buat <code>test/features/&lt;feature&gt;/</code> — controller, repository,
+                        widget tests</li>
+                </ul>
+                <h3 data-i18n="never_h">Yang TIDAK Boleh Dilakukan</h3>
+                <ul class="never-list">
+                    <li data-i18n="nv1">Tulis <code>await http.get(...)</code> langsung di controller atau widget —
+                        gunakan <code>ApiClient</code> via remote source</li>
+                    <li data-i18n="nv2">Taruh <code>if (userRole == 'admin')</code> di dalam view — itu milik controller
+                    </li>
+                    <li data-i18n="nv3">Import dari folder fitur lain</li>
+                    <li data-i18n="nv4">Gunakan jaringan nyata atau file system di tests</li>
+                    <li data-i18n="nv5">Throw exception dari repository — kembalikan <code>Failure(...)</code></li>
+                </ul>
+            </div>
+
+            <!-- 17 PACKAGES -->
+            <div class="section" id="packages">
+                <div class="section-header"><span class="section-num">17</span>
+                    <h2>Key Packages</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th data-i18n="th_role">Peran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>provider</td>
+                            <td data-i18n="pk1">DI + state propagation ke widget tree</td>
+                        </tr>
+                        <tr>
+                            <td>http</td>
+                            <td data-i18n="pk2">HTTP client (digunakan oleh ApiClient)</td>
+                        </tr>
+                        <tr>
+                            <td>hive / hive_flutter</td>
+                            <td data-i18n="pk3">Fast local storage backend</td>
+                        </tr>
+                        <tr>
+                            <td>shared_preferences</td>
+                            <td data-i18n="pk4">Simple key-value storage backend</td>
+                        </tr>
+                        <tr>
+                            <td>flutter_test</td>
+                            <td data-i18n="pk5">Widget dan unit testing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <footer class="footer">
+            <div><span class="footer-brand">Karna MVC</span><span style="color:var(--border2)"> — </span><span>Flutter
+                    Architecture</span></div>
+            <span style="color:var(--border2)" data-i18n="footer">karena setiap layer ada karena fiturnya</span>
+        </footer>
+    </main>
+
+    <script>
+        const T = {
+            id: {
+                nav_s1: 'Overview', nav_intro: 'Pengantar', nav_principles: 'Prinsip Utama', nav_s4: 'Panduan', nav_newfeature: 'Feature Baru',
+                hero_quote: 'Dinamai dari Karna dalam Mahabharata — seorang ksatria yang sempurna dalam dirinya sendiri, tidak membutuhkan apapun dari luar — namun berjuang untuk keseluruhan yang lebih besar. Dalam Bahasa Indonesia: <em>karena</em> — setiap layer ada <em>karena</em> fiturnya.',
+                s01_h: 'Prinsip Utama',
+                p1t: 'Typed Error Handling', p1d: 'Repository mengembalikan <code>Result&lt;T&gt;</code> (sealed Success/Failure), tidak pernah throw exception.',
+                p2d: 'Setiap load call mendeklarasikan strategi: <code>localFirst</code>, <code>staleWhileRevalidate</code>, atau <code>remoteFirst</code>.',
+                p3d: 'Interface <code>LocalStorage</code> tunggal sebagai backing semua cache (Hive, SharedPrefs, InMemory).',
+                p4d: 'Repository memeriksa jaringan sebelum remote call, mengembalikan typed failures saat offline.',
+                p5d: '<code>BaseController</code> mengelola loading/error/refresh state untuk semua controller.',
+                p6d: 'Typed <code>EventBus</code> mengaktifkan komunikasi lintas-fitur tanpa coupling.',
+                s03p: 'Sealed type yang memaksa error handling eksplisit. Repository <strong>tidak pernah throw</strong> — selalu mengembalikan <code>Result&lt;T&gt;</code>.',
+                s04p: 'Typed exceptions memungkinkan UI bereaksi berbeda untuk setiap jenis kegagalan.',
+                th_desc: 'Keterangan', th_fields: 'Field Tambahan',
+                ex1: 'Base class semua exception', ex2: 'Tidak ada koneksi internet', ex3: '4xx / 5xx dari server', ex4: 'Kegagalan local storage',
+                s05p: 'Setiap controller mendeklarasikan bagaimana data diselesaikan antara lokal dan remote.',
+                cm_lf: '/// Cache dulu, network hanya jika miss. Cocok: data jarang berubah.',
+                cm_swr: '/// Tampilkan cache, refresh dari network di background. Cocok: feeds, dashboard.',
+                cm_rf: '/// Selalu hit network, fallback ke cache jika gagal. Cocok: data real-time.',
+                matrix_h: 'Matriks Perilaku', th_scenario: 'Skenario',
+                sc1: 'Cache hit, network ok', sc1swr: 'Cache → Fresh', sc2: 'Cache hit, network fail', sc2swr: 'Cache, silent fail', sc2rf: 'Fallback Cache',
+                sc3: 'Cache miss, network ok', sc4: 'Cache miss, network fail',
+                s06p: 'Semua controller extend class ini. Menyediakan loading/error/refresh state secara otomatis.',
+                bc1: '// true saat initial load', bc2: '// true saat background refresh',
+                s07p: 'HTTP wrapper tipis yang mengelola auth, retry, dan mapping error.',
+                th_feat: 'Fitur', th_detail: 'Detail',
+                api1: 'Dari <code>AppConfig</code> via <code>--dart-define</code>',
+                api2: '<code>setAuthToken(token)</code> — inject ke semua request',
+                api3: '2x retry dengan backoff untuk transient failure',
+                api4: 'HTTP status → typed <code>AppException</code>',
+                s08p: 'Interface storage-agnostic. Ganti implementasi di DI — semua fitur mengikuti otomatis.',
+                th_impl: 'Implementasi', th_best: 'Terbaik untuk',
+                st1: 'Dev, tests, prototyping', st2: 'Settings, key-value kecil', st3: 'Dataset besar, offline-first',
+                s09p: 'Sistem notifikasi typed app-wide untuk komunikasi lintas-fitur. Fitur tidak pernah mengimport satu sama lain.',
+                eb1: '// Publish (dari controller atau repository)', eb2: '// Subscribe (dalam controller)', eb3: '// Wajib cancel di dispose()',
+                ev_h: 'Built-in Events', th_when: 'Kapan Difire',
+                ev1: 'User berhasil login', ev2: 'User logout atau session dihapus', ev3: 'Auth token kedaluwarsa',
+                ev4: 'Data profil berubah', ev5: 'Status jaringan berubah', ev6: 'Cache app-wide dihapus',
+                s10p: 'Pure Dart classes. Tidak ada Flutter dependency. Field immutable, memiliki <code>fromJson</code>, <code>toJson</code>, dan <code>copyWith</code>.',
+                s11p: 'Abstract interface mengembalikan <code>Result&lt;T&gt;</code>. Implementasi mengorkestrasikan local + remote dengan connectivity check.',
+                r1: '// Abstract interface', r2: '// Connectivity check pattern',
+                s13p: 'Hanya UI logic. Baca state dari controller, panggil methods. Tidak ada business logic di sini.',
+                view_cm: '// background refresh indicator',
+                s14p: '<code>core/di/providers.dart</code> adalah <strong>satu-satunya file</strong> yang mengimport lintas fitur. Menerima <code>LocalStorage</code> sebagai parameter dari <code>main()</code>.',
+                di1: '// Core singletons', di2: '// Feature controllers — wiring terjadi di sini',
+                s15p: 'Tests mencerminkan struktur <code>features/</code> secara persis. Gunakan <code>InMemoryStorage</code> — tidak perlu Hive atau SharedPrefs.',
+                t1: '// Controller test', t1s: "'localFirst menampilkan cached data'", t2: '// Repository test', t2s: "'failure saat offline dan tanpa cache'",
+                s16h: 'Menambah Feature Baru', s16p: 'Jalankan generator atau buat manual mengikuti urutan ini:',
+                cl1: 'Buat <code>lib/features/&lt;feature&gt;/model/&lt;name&gt;_model.dart</code>',
+                cl2: 'Buat <code>repository/&lt;name&gt;_repository.dart</code> (abstract, returns <code>Result&lt;T&gt;</code>)',
+                cl3: 'Buat <code>repository/&lt;name&gt;_repository_impl.dart</code> (orchestrate local + connectivity)',
+                cl4: 'Buat <code>data_source/&lt;name&gt;_remote_source.dart</code> (gunakan <code>ApiClient</code>)',
+                cl5: 'Buat <code>data_source/&lt;name&gt;_local_source.dart</code> (gunakan <code>LocalStorage</code>)',
+                cl6: 'Buat <code>controller/&lt;name&gt;_controller.dart</code> (extends <code>BaseController</code>)',
+                cl7: 'Buat <code>view/&lt;name&gt;_view.dart</code>',
+                cl8: 'Daftarkan controller di <code>core/di/providers.dart</code>',
+                cl9: 'Buat <code>test/features/&lt;feature&gt;/</code> — controller, repository, widget tests',
+                never_h: 'Yang TIDAK Boleh Dilakukan',
+                nv1: 'Tulis <code>await http.get(...)</code> langsung di controller atau widget — gunakan <code>ApiClient</code> via remote source',
+                nv2: "Taruh <code>if (userRole == 'admin')</code> di dalam view — itu milik controller",
+                nv3: 'Import dari folder fitur lain', nv4: 'Gunakan jaringan nyata atau file system di tests',
+                nv5: 'Throw exception dari repository — kembalikan <code>Failure(...)</code>',
+                th_role: 'Peran',
+                pk1: 'DI + state propagation ke widget tree', pk2: 'HTTP client (digunakan oleh ApiClient)',
+                pk3: 'Fast local storage backend', pk4: 'Simple key-value storage backend', pk5: 'Widget dan unit testing',
+                footer: 'karena setiap layer ada karena fiturnya',
+            },
+            en: {
+                nav_s1: 'Overview', nav_intro: 'Introduction', nav_principles: 'Key Principles', nav_s4: 'Guide', nav_newfeature: 'New Feature',
+                hero_quote: 'Named after Karna of the Mahabharata — a warrior complete in himself, needing nothing from outside — yet fighting for a greater whole. In Indonesian: <em>karena</em> (because of) — every layer exists <em>because of</em> its feature.',
+                s01_h: 'Key Principles',
+                p1t: 'Typed Error Handling', p1d: 'Repositories return <code>Result&lt;T&gt;</code> (sealed Success/Failure), never throw exceptions.',
+                p2d: 'Every load call declares its strategy: <code>localFirst</code>, <code>staleWhileRevalidate</code>, or <code>remoteFirst</code>.',
+                p3d: 'A single <code>LocalStorage</code> interface backs all caching (Hive, SharedPrefs, InMemory).',
+                p4d: 'Repositories check network before remote calls, returning typed failures when offline.',
+                p5d: '<code>BaseController</code> handles loading/error/refresh state for all controllers.',
+                p6d: 'A typed <code>EventBus</code> enables cross-feature communication without coupling.',
+                s03p: 'A sealed type that forces explicit error handling. Repositories <strong>never throw</strong> — they always return <code>Result&lt;T&gt;</code>.',
+                s04p: 'Typed exceptions allow the UI to react differently to each kind of failure.',
+                th_desc: 'Description', th_fields: 'Extra Fields',
+                ex1: 'Base class for all exceptions', ex2: 'No internet connection', ex3: '4xx / 5xx from server', ex4: 'Local storage failure',
+                s05p: 'Each controller declares how data is resolved between local and remote.',
+                cm_lf: '/// Cache first, network only on miss. Best for: rarely-changing data.',
+                cm_swr: '/// Show cache immediately, refresh in background. Best for: feeds, dashboards.',
+                cm_rf: '/// Always hit network, fall back to cache on failure. Best for: real-time data.',
+                matrix_h: 'Behavior Matrix', th_scenario: 'Scenario',
+                sc1: 'Cache hit, network ok', sc1swr: 'Cache → Fresh', sc2: 'Cache hit, network fail', sc2swr: 'Cache, silent fail', sc2rf: 'Fallback Cache',
+                sc3: 'Cache miss, network ok', sc4: 'Cache miss, network fail',
+                s06p: 'All controllers extend this class. Provides loading/error/refresh state automatically.',
+                bc1: '// true during initial load', bc2: '// true during background refresh',
+                s07p: 'A thin HTTP wrapper handling auth, retry logic, and error mapping.',
+                th_feat: 'Feature', th_detail: 'Detail',
+                api1: 'From <code>AppConfig</code> via <code>--dart-define</code>',
+                api2: '<code>setAuthToken(token)</code> — injected into every request',
+                api3: '2 retries with backoff for transient failures',
+                api4: 'HTTP status → typed <code>AppException</code>',
+                s08p: 'Storage-agnostic interface. Swap the implementation in DI — all features follow automatically.',
+                th_impl: 'Implementation', th_best: 'Best for',
+                st1: 'Dev, tests, prototyping', st2: 'Settings, small key-value data', st3: 'Larger datasets, offline-first',
+                s09p: 'A typed app-wide notification system for cross-feature communication. Features never import each other.',
+                eb1: '// Publish (from a controller or repository)', eb2: '// Subscribe (in a controller)', eb3: '// Must cancel in dispose()',
+                ev_h: 'Built-in Events', th_when: 'Fired when',
+                ev1: 'User successfully logs in', ev2: 'User logs out or session is cleared', ev3: 'Auth token has expired',
+                ev4: 'Profile data changes', ev5: 'Network status changes', ev6: 'App-wide cache is cleared',
+                s10p: 'Pure Dart classes. No Flutter dependency. Immutable fields with <code>fromJson</code>, <code>toJson</code>, and <code>copyWith</code>.',
+                s11p: 'Abstract interface returns <code>Result&lt;T&gt;</code>. Implementation orchestrates local + remote with connectivity checks.',
+                r1: '// Abstract interface', r2: '// Connectivity check pattern',
+                s13p: 'UI logic only. Read state from the controller, call methods on it. Zero business logic here.',
+                view_cm: '// background refresh indicator',
+                s14p: '<code>core/di/providers.dart</code> is the <strong>only file</strong> that imports across features. It receives <code>LocalStorage</code> as a parameter from <code>main()</code>.',
+                di1: '// Core singletons', di2: '// Feature controllers — wiring happens here',
+                s15p: 'Tests mirror the <code>features/</code> folder structure exactly. Use <code>InMemoryStorage</code> — no Hive or SharedPrefs needed.',
+                t1: '// Controller test', t1s: "'localFirst shows cached data'", t2: '// Repository test', t2s: "'returns failure when offline and no cache'",
+                s16h: 'Adding a New Feature', s16p: 'Run the generator or create manually in this order:',
+                cl1: 'Create <code>lib/features/&lt;feature&gt;/model/&lt;name&gt;_model.dart</code>',
+                cl2: 'Create <code>repository/&lt;name&gt;_repository.dart</code> (abstract, returns <code>Result&lt;T&gt;</code>)',
+                cl3: 'Create <code>repository/&lt;name&gt;_repository_impl.dart</code> (orchestrate local + connectivity)',
+                cl4: 'Create <code>data_source/&lt;name&gt;_remote_source.dart</code> (use <code>ApiClient</code>)',
+                cl5: 'Create <code>data_source/&lt;name&gt;_local_source.dart</code> (use <code>LocalStorage</code>)',
+                cl6: 'Create <code>controller/&lt;name&gt;_controller.dart</code> (extends <code>BaseController</code>)',
+                cl7: 'Create <code>view/&lt;name&gt;_view.dart</code>',
+                cl8: 'Register the controller in <code>core/di/providers.dart</code>',
+                cl9: 'Create <code>test/features/&lt;feature&gt;/</code> — controller, repository, and widget tests',
+                never_h: 'Never Do',
+                nv1: 'Write <code>await http.get(...)</code> directly in a controller or widget — use <code>ApiClient</code> in a remote source',
+                nv2: "Put <code>if (userRole == 'admin')</code> in a view — that belongs in the controller",
+                nv3: 'Import from another feature folder', nv4: 'Use a real network or file system in tests',
+                nv5: 'Throw exceptions from repositories — return <code>Failure(...)</code> instead',
+                th_role: 'Role',
+                pk1: 'DI + state propagation to the widget tree', pk2: 'HTTP client (used by ApiClient)',
+                pk3: 'Fast local storage backend', pk4: 'Simple key-value storage backend', pk5: 'Widget and unit testing',
+                footer: 'every layer exists because of its feature',
+            }
+        };
+
+        let lang = 'id';
+
+        function setLang(l) {
+            if (l === lang) return;
+            lang = l;
+            document.documentElement.lang = l;
+            document.querySelectorAll('.lang-btn').forEach((b, i) => b.classList.toggle('active', i === (l === 'id' ? 0 : 1)));
+            const els = document.querySelectorAll('[data-i18n]');
+            els.forEach(el => el.classList.add('fading'));
+            setTimeout(() => {
+                els.forEach(el => {
+                    const v = T[lang][el.getAttribute('data-i18n')];
+                    if (v !== undefined) el.innerHTML = v;
+                    el.classList.remove('fading');
+                });
+            }, 130);
+        }
+
+        function goTo(id) {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Active nav on scroll
+        const allNavLinks = document.querySelectorAll('.nav-link');
+        const ids = ['overview', 'principles', 'structure', 'result', 'exceptions', 'strategy', 'controller', 'api', 'storage', 'events', 'model', 'repository', 'fcontroller', 'view', 'di', 'testing', 'checklist', 'packages'];
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const id = e.target.id;
+                    allNavLinks.forEach(a => {
+                        const oc = a.getAttribute('onclick') || '';
+                        a.classList.toggle('active', oc.includes(`'${id}'`));
+                    });
+                }
+            });
+        }, { threshold: 0.2 });
+
+        ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    </script>
+</body>
+
+</html>
