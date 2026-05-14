@@ -632,6 +632,31 @@
                 <span class="pill blue">DataStrategy</span><span class="pill blue">EventBus</span>
                 <span class="pill green">Storage-Agnostic</span><span class="pill green">Zero Boilerplate</span>
             </div>
+
+            <div
+                style="margin-top:2.5rem;padding:1.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;">
+                <h3 style="font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin:0 0 1rem;"
+                    data-i18n="gs_h">Cara Menggunakan</h3>
+                <pre
+                    style="margin:0;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;"><code style="line-height:2;"><span class="cm" data-i18n="gs_1"># Clone repository</span>
+git clone https://github.com/AkhmadRamadani/karna-flutter-base.git my_app
+<span class="kw">cd</span> my_app
+
+<span class="cm" data-i18n="gs_2"># Install dependencies</span>
+flutter pub get
+
+<span class="cm" data-i18n="gs_3"># Jalankan contoh</span>
+flutter run
+
+<span class="cm" data-i18n="gs_4"># Buat fitur pertamamu</span>
+./scripts/create_feature.sh my_feature
+
+<span class="cm" data-i18n="gs_5"># Hapus fitur contoh jika sudah tidak diperlukan</span>
+rm -rf lib/features/post test/features/post</code></pre>
+                <p style="font-size:12px;color:var(--muted);margin:0.75rem 0 0;" data-i18n="gs_note">Project ini adalah
+                    <strong>starter template</strong> — bukan package. Clone, pelajari contoh fitur <code>post</code>,
+                    lalu hapus dan mulai bangun fitur sendiri.</p>
+            </div>
         </div>
 
         <div class="content">
@@ -1201,7 +1226,8 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
                 </table>
                 <p style="font-size:12px;color:var(--accent);margin-top:0.5rem;" data-i18n="pk_note">⚠ Pilih salah satu:
                     <code>hive</code> untuk dataset besar/offline-first, atau <code>shared_preferences</code> untuk
-                    key-value sederhana. Tidak perlu keduanya.</p>
+                    key-value sederhana. Tidak perlu keduanya.
+                </p>
             </div>
 
         </div>
@@ -1218,6 +1244,8 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
             id: {
                 nav_s1: 'Overview', nav_intro: 'Pengantar', nav_principles: 'Prinsip Utama', nav_s4: 'Panduan', nav_newfeature: 'Feature Baru',
                 hero_quote: 'Dinamai dari Karna dalam Mahabharata — seorang ksatria yang sempurna dalam dirinya sendiri, tidak membutuhkan apapun dari luar — namun berjuang untuk keseluruhan yang lebih besar. Dalam Bahasa Indonesia: <em>karena</em> — setiap layer ada <em>karena</em> fiturnya.',
+                gs_h: 'Cara Menggunakan', gs_1: '# Clone repository', gs_2: '# Install dependencies', gs_3: '# Jalankan contoh', gs_4: '# Buat fitur pertamamu', gs_5: '# Hapus fitur contoh jika sudah tidak diperlukan',
+                gs_note: 'Project ini adalah <strong>starter template</strong> — bukan package. Clone, pelajari contoh fitur <code>post</code>, lalu hapus dan mulai bangun fitur sendiri.',
                 s01_h: 'Prinsip Utama',
                 p1t: 'Typed Error Handling', p1d: 'Repository mengembalikan <code>Result&lt;T&gt;</code> (sealed Success/Failure), tidak pernah throw exception.',
                 p2d: 'Setiap load call mendeklarasikan strategi: <code>localFirst</code>, <code>staleWhileRevalidate</code>, atau <code>remoteFirst</code>.',
@@ -1285,6 +1313,8 @@ test(<span class="str" data-i18n="t2s">'failure saat offline dan tanpa cache'</s
             en: {
                 nav_s1: 'Overview', nav_intro: 'Introduction', nav_principles: 'Key Principles', nav_s4: 'Guide', nav_newfeature: 'New Feature',
                 hero_quote: 'Named after Karna of the Mahabharata — a warrior complete in himself, needing nothing from outside — yet fighting for a greater whole. In Indonesian: <em>karena</em> (because of) — every layer exists <em>because of</em> its feature.',
+                gs_h: 'Getting Started', gs_1: '# Clone the repository', gs_2: '# Install dependencies', gs_3: '# Run the example', gs_4: '# Create your first feature', gs_5: '# Delete the example feature when ready',
+                gs_note: 'This is a <strong>starter template</strong> — not a package. Clone it, explore the <code>post</code> example feature, then delete it and start building your own.',
                 s01_h: 'Key Principles',
                 p1t: 'Typed Error Handling', p1d: 'Repositories return <code>Result&lt;T&gt;</code> (sealed Success/Failure), never throw exceptions.',
                 p2d: 'Every load call declares its strategy: <code>localFirst</code>, <code>staleWhileRevalidate</code>, or <code>remoteFirst</code>.',
