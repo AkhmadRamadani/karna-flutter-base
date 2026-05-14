@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:karna_mvc/core/events/event_bus.dart';
 import 'package:karna_mvc/core/result/result.dart';
 import 'package:karna_mvc/features/profile/controller/profile_controller.dart';
 import 'package:karna_mvc/features/profile/model/profile_model.dart';
@@ -47,13 +48,18 @@ void main() {
   testWidgets('ProfileView displays "No profile found." initially', (
     tester,
   ) async {
+    final eventBus = EventBusImpl();
     await tester.pumpWidget(
       ChangeNotifierProvider<ProfileController>(
-        create: (_) => ProfileController(repository: FakeProfileRepository()),
+        create: (_) => ProfileController(
+          repository: FakeProfileRepository(),
+          eventBus: eventBus,
+        ),
         child: const MaterialApp(home: ProfileView()),
       ),
     );
 
     expect(find.text('No profile found.'), findsOneWidget);
+    eventBus.dispose();
   });
 }

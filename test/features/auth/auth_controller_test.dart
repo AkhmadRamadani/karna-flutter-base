@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karna_mvc/core/errors/app_exception.dart';
+import 'package:karna_mvc/core/events/event_bus.dart';
 import 'package:karna_mvc/core/network/data_strategy.dart';
 import 'package:karna_mvc/core/result/result.dart';
 import 'package:karna_mvc/features/auth/controller/auth_controller.dart';
@@ -28,10 +29,17 @@ class MockAuthRepository implements AuthRepository {
 void main() {
   late MockAuthRepository mockRepo;
   late AuthController controller;
+  late EventBusImpl eventBus;
 
   setUp(() {
     mockRepo = MockAuthRepository();
-    controller = AuthController(repository: mockRepo);
+    eventBus = EventBusImpl();
+    controller = AuthController(repository: mockRepo, eventBus: eventBus);
+  });
+
+  tearDown(() {
+    controller.dispose();
+    eventBus.dispose();
   });
 
   group('DataStrategy.localFirst', () {

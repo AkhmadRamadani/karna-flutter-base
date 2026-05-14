@@ -15,6 +15,9 @@ lib/
 │   ├── controller/base_controller.dart   # Shared loading/error/strategy logic
 │   ├── di/providers.dart                 # Wires all feature providers (DI)
 │   ├── errors/app_exception.dart         # Typed exception hierarchy
+│   ├── events/
+│   │   ├── event_bus.dart                # Abstract EventBus + stream impl
+│   │   └── app_events.dart              # Typed app-wide event classes
 │   ├── extensions/                       # Dart extension methods
 │   ├── network/
 │   │   ├── api_client.dart               # HTTP client with retry & auth
@@ -175,6 +178,24 @@ Shared HTTP client with:
 ### Connectivity Awareness
 
 Repositories check network before remote calls and return typed `NetworkException` failures, allowing the UI to show appropriate offline states.
+
+### Event Bus (Cross-Feature Notifications)
+
+Features never import each other — but sometimes one feature needs to react when something happens in another (e.g. user logs out → clear profile cache). The `EventBus` solves this with typed, fire-and-forget events:
+
+```dart
+// Publishing — AuthController fires on logout:
+_eventBus.fire(const UserLoggedOutEvent());
+
+// Subscribing — ProfileController reacts without importing auth:
+_logoutSub = _eventBus.on<UserLoggedOutEvent>().listen((_) {
+  _clearProfile();
+});
+```
+
+Built-in events: `UserLoggedInEvent`, `UserLoggedOutEvent`, `SessionExpiredEvent`, `UserProfileUpdatedEvent`, `ConnectivityChangedEvent`, `CacheClearedEvent`.
+
+Add custom events by extending `AppEvent` in `core/events/app_events.dart`. The event bus is injected via constructor — fully mockable in tests.
 
 ## Architecture Rules
 

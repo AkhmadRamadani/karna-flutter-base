@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karna_mvc/core/errors/app_exception.dart';
+import 'package:karna_mvc/core/events/event_bus.dart';
 import 'package:karna_mvc/core/network/data_strategy.dart';
 import 'package:karna_mvc/core/result/result.dart';
 import 'package:karna_mvc/features/profile/controller/profile_controller.dart';
@@ -32,10 +33,17 @@ class MockProfileRepository implements ProfileRepository {
 void main() {
   late MockProfileRepository mockRepo;
   late ProfileController controller;
+  late EventBusImpl eventBus;
 
   setUp(() {
     mockRepo = MockProfileRepository();
-    controller = ProfileController(repository: mockRepo);
+    eventBus = EventBusImpl();
+    controller = ProfileController(repository: mockRepo, eventBus: eventBus);
+  });
+
+  tearDown(() {
+    controller.dispose();
+    eventBus.dispose();
   });
 
   group('DataStrategy.localFirst (default)', () {

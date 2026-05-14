@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:karna_mvc/core/events/event_bus.dart';
 import 'package:karna_mvc/core/result/result.dart';
 import 'package:karna_mvc/features/auth/controller/auth_controller.dart';
 import 'package:karna_mvc/features/auth/model/user_model.dart';
@@ -26,13 +27,18 @@ class FakeAuthRepository implements AuthRepository {
 
 void main() {
   testWidgets('LoginView displays "No user found." initially', (tester) async {
+    final eventBus = EventBusImpl();
     await tester.pumpWidget(
       ChangeNotifierProvider<AuthController>(
-        create: (_) => AuthController(repository: FakeAuthRepository()),
+        create: (_) => AuthController(
+          repository: FakeAuthRepository(),
+          eventBus: eventBus,
+        ),
         child: const MaterialApp(home: LoginView()),
       ),
     );
 
     expect(find.text('No user found.'), findsOneWidget);
+    eventBus.dispose();
   });
 }

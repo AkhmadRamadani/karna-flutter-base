@@ -21,6 +21,7 @@ Key principles:
 - **Storage-agnostic** — a single `LocalStorage` interface backs all caching (Hive, SharedPrefs, InMemory)
 - **Connectivity-aware** — repositories check network before remote calls, return typed failures
 - **Zero boilerplate** — `BaseController` handles loading/error/refresh state for all controllers
+- **Event-driven** — a typed `EventBus` enables cross-feature communication without coupling
 
 ---
 
@@ -38,6 +39,9 @@ lib/
 │   │   └── providers.dart                # Wires all feature providers (DI)
 │   ├── errors/
 │   │   └── app_exception.dart            # Typed exception hierarchy
+│   ├── events/
+│   │   ├── event_bus.dart                # Abstract EventBus + stream impl
+│   │   └── app_events.dart              # Typed app-wide event classes
 │   ├── extensions/
 │   │   └── context_extensions.dart       # Dart extension methods
 │   ├── network/
@@ -254,6 +258,75 @@ abstract class ConnectivityChecker {
 ```
 
 Repositories check this before attempting remote calls. Returns typed `NetworkException` when offline.
+
+---
+
+### EventBus (`core/events/event_bus.dart`)
+
+A typed, app-wide notification system for cross-feature communication. Features never import each other — but sometimes Feature A needs to react when something happens in Feature B (e.g. user logs out → clear profile cache). The event bus solves this without coupling features together.
+
+```dart
+abstract class EventBus {
+  /// Listen to events of a specific type [T].
+  Stream<T> on<T extends AppEvent>();
+
+  /// Fire an event to all listeners of that event type.
+  void fire(AppEvent event);
+
+  /// Dispose the event bus and close the underlying stream.
+  void dispose();
+}
+
+abstract class AppEvent {
+  const AppEvent();
+}
+```
+
+**Built-in events** (`core/events/app_events.dart`):
+
+| Event | Fired when |
+|-------|-----------|
+| `UserLoggedInEvent` | User successfully logs in |
+| `UserLoggedOutEvent` | User logs out or session is cleared |
+| `SessionExpiredEvent` | Auth token has expired |
+| `UserProfileUpdatedEvent` | Profile data changes |
+| `ConnectivityChangedEvent` | Network status changes |
+| `CacheClearedEvent` | App-wide cache is cleared |
+
+**Publishing (in a controller or repository):**
+
+```dart
+eventBus.fire(UserLoggedOutEvent());
+```
+
+**Subscribing (in a controller):**
+
+```dart
+class ProfileController extends BaseController {
+  final EventBus _eventBus;
+  late final StreamSubscription _logoutSub;
+
+  ProfileController({required EventBus eventBus, ...})
+      : _eventBus = eventBus {
+    _logoutSub = _eventBus.on<UserLoggedOutEvent>().listen((_) {
+      clearProfile();
+    });
+  }
+
+  @override
+  void dispose() {
+    _logoutSub.cancel();
+    super.dispose();
+  }
+}
+```
+
+**Rules:**
+- Events are fire-and-forget — publishers don't wait for listeners
+- Controllers must cancel subscriptions in `dispose()`
+- Events carry only the minimum data needed (IDs, not full models)
+- New event types go in `core/events/app_events.dart`
+- The `EventBus` is injected via constructor (fully mockable in tests)
 
 ---
 

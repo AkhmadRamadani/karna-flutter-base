@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../config/app_config.dart';
+import '../events/event_bus.dart';
 import '../network/api_client.dart';
 import '../network/connectivity_checker.dart';
 import '../storage/local_storage.dart';
@@ -21,6 +22,10 @@ List<SingleChildWidget> appProviders({required LocalStorage storage}) => [
   Provider<AppConfig>(create: (_) => AppConfig.fromEnvironment()),
   Provider<ConnectivityChecker>(create: (_) => ConnectivityCheckerImpl()),
   Provider<LocalStorage>(create: (_) => storage),
+  Provider<EventBus>(
+    create: (_) => EventBusImpl(),
+    dispose: (_, bus) => bus.dispose(),
+  ),
   ProxyProvider<AppConfig, ApiClient>(
     update: (_, config, previous) {
       previous?.dispose();
@@ -37,6 +42,7 @@ List<SingleChildWidget> appProviders({required LocalStorage storage}) => [
         localSource: AuthLocalSourceImpl(storage: context.read<LocalStorage>()),
         connectivity: context.read<ConnectivityChecker>(),
       ),
+      eventBus: context.read<EventBus>(),
     ),
   ),
   ChangeNotifierProvider<ProfileController>(
@@ -50,6 +56,7 @@ List<SingleChildWidget> appProviders({required LocalStorage storage}) => [
         ),
         connectivity: context.read<ConnectivityChecker>(),
       ),
+      eventBus: context.read<EventBus>(),
     ),
   ),
 ];
