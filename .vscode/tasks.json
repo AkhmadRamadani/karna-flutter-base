@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Karna: Create Feature",
+      "type": "shell",
+      "command": "./scripts/create_feature.sh",
+      "args": ["${input:featureName}"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "featureName",
+      "description": "Feature name (snake_case, e.g. payment, order_history)",
+      "type": "promptString"
+    }
+  ]
+}
