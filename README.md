@@ -1,9 +1,31 @@
 # Karna MVC
 
-A feature-first Model-View-Controller architecture for Flutter with typed error handling, pluggable data strategies, and storage-agnostic caching. Each feature is self-contained and depends on nothing outside itself except `core/`.
+A feature-first Model-View-Controller starter template for Flutter with typed error handling, pluggable data strategies, storage-agnostic caching, and event-driven cross-feature communication. Each feature is self-contained and depends on nothing outside itself except `core/`.
 
 > Named after Karna of the Mahabharata: a warrior complete in himself.
 > In Indonesian: *karena* (because of) — every layer exists because of its feature.
+
+This is a **starter project** — not a package. Clone it, delete the example `post` feature, and start building your own features using the same patterns.
+
+## Quick Start
+
+```bash
+# Clone and rename
+git clone <this-repo> my_app
+cd my_app
+
+# Install dependencies
+flutter pub get
+
+# Run the example
+flutter run
+
+# Create your first feature
+./scripts/create_feature.sh my_feature
+
+# Then delete the example feature when you're ready
+rm -rf lib/features/post test/features/post
+```
 
 ## Project Structure
 
@@ -139,13 +161,13 @@ Controllers declare how data is loaded via `DataStrategy`:
 
 ```dart
 // Default — cache first, network on miss
-await controller.loadUser('1');
+await controller.loadPosts();
 
 // Show stale cache immediately, refresh in background
-await controller.loadUser('1', strategy: DataStrategy.staleWhileRevalidate);
+await controller.loadPosts(strategy: DataStrategy.staleWhileRevalidate);
 
 // Always hit network, fall back to cache on failure
-await controller.loadUser('1', strategy: DataStrategy.remoteFirst);
+await controller.loadPosts(strategy: DataStrategy.remoteFirst);
 ```
 
 ### BaseController
@@ -181,21 +203,46 @@ Repositories check network before remote calls and return typed `NetworkExceptio
 
 ### Event Bus (Cross-Feature Notifications)
 
-Features never import each other — but sometimes one feature needs to react when something happens in another (e.g. user logs out → clear profile cache). The `EventBus` solves this with typed, fire-and-forget events:
+Features never import each other — but sometimes one feature needs to react when something happens in another. The `EventBus` solves this with typed, fire-and-forget events:
 
 ```dart
-// Publishing — AuthController fires on logout:
-_eventBus.fire(const UserLoggedOutEvent());
+// Publishing — fire an event from any controller:
+_eventBus.fire(const CacheClearedEvent());
 
-// Subscribing — ProfileController reacts without importing auth:
-_logoutSub = _eventBus.on<UserLoggedOutEvent>().listen((_) {
-  _clearProfile();
+// Subscribing — react in another controller without importing the publisher:
+_cacheSub = _eventBus.on<CacheClearedEvent>().listen((_) {
+  _posts = [];
+  notifyListeners();
 });
 ```
 
 Built-in events: `UserLoggedInEvent`, `UserLoggedOutEvent`, `SessionExpiredEvent`, `UserProfileUpdatedEvent`, `ConnectivityChangedEvent`, `CacheClearedEvent`.
 
 Add custom events by extending `AppEvent` in `core/events/app_events.dart`. The event bus is injected via constructor — fully mockable in tests.
+
+## Example Feature: Post
+
+The project ships with a single `post` feature that demonstrates the full pattern end-to-end. Use it as a reference, then delete it when you start building your own features.
+
+```
+lib/features/post/
+├── model/post_model.dart                    # Immutable model with fromJson/toJson/copyWith
+├── repository/
+│   ├── post_repository.dart                 # Abstract interface (returns Result<T>)
+│   ├── post_repository_impl.dart            # Orchestrates local + remote + connectivity
+│   └── data_source/
+│       ├── post_remote_source.dart          # HTTP via ApiClient
+│       └── post_local_source.dart           # Cache via LocalStorage
+├── controller/post_controller.dart          # All 3 data strategies + EventBus
+└── view/post_view.dart                      # Uses shared widgets, pull-to-refresh
+```
+
+The example demonstrates:
+- All three `DataStrategy` modes in the controller
+- `EventBus` subscription (reacts to `CacheClearedEvent`)
+- Proper `dispose()` with subscription cleanup
+- View using `LoadingIndicator`, `ErrorDisplay`, and `RefreshIndicator`
+- Full test coverage (controller, repository, view)
 
 ## Architecture Rules
 

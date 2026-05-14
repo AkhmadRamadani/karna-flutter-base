@@ -33,7 +33,7 @@ class KarnaApp extends StatelessWidget {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         routes: AppRoutes.routes,
-        initialRoute: AppRoutes.login,
+        initialRoute: AppRoutes.posts,
       ),
     );
   }

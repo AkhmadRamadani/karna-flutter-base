@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../../features/auth/view/login_view.dart';
-import '../../features/profile/view/profile_view.dart';
+import '../../features/post/view/post_view.dart';
 
 /// Centralized route definitions.
+///
+/// Add new routes here as you create features.
+/// Example:
+///   static const String myFeature = '/my-feature';
+///   // then add to the routes map below.
 class AppRoutes {
   AppRoutes._();
 
-  static const String login = '/login';
-  static const String profile = '/profile';
+  // Example route (replace with your own)
+  static const String posts = '/';
 
   static Map<String, WidgetBuilder> get routes => {
-    login: (_) => const LoginView(),
-    profile: (_) => const ProfileView(),
+    posts: (_) => const PostView(),
   };
 }

@@ -6,19 +6,20 @@ import '../events/event_bus.dart';
 import '../network/api_client.dart';
 import '../network/connectivity_checker.dart';
 import '../storage/local_storage.dart';
-import '../../features/auth/controller/auth_controller.dart';
-import '../../features/auth/repository/auth_repository_impl.dart';
-import '../../features/auth/repository/data_source/auth_remote_source.dart';
-import '../../features/auth/repository/data_source/auth_local_source.dart';
-import '../../features/profile/controller/profile_controller.dart';
-import '../../features/profile/repository/profile_repository_impl.dart';
-import '../../features/profile/repository/data_source/profile_remote_source.dart';
-import '../../features/profile/repository/data_source/profile_local_source.dart';
+import '../../features/post/controller/post_controller.dart';
+import '../../features/post/repository/post_repository_impl.dart';
+import '../../features/post/repository/data_source/post_remote_source.dart';
+import '../../features/post/repository/data_source/post_local_source.dart';
 
 /// All feature providers wired together.
 /// [storage] must be initialized before calling this (e.g. in main()).
+///
+/// To add a new feature:
+/// 1. Import its controller + repository + data sources
+/// 2. Add a ChangeNotifierProvider at the bottom
+/// 3. Wire dependencies via `context.read<T>()`
 List<SingleChildWidget> appProviders({required LocalStorage storage}) => [
-  // Core singletons
+  // ─── Core singletons ─────────────────────────────────────────────
   Provider<AppConfig>(create: (_) => AppConfig.fromEnvironment()),
   Provider<ConnectivityChecker>(create: (_) => ConnectivityCheckerImpl()),
   Provider<LocalStorage>(create: (_) => storage),
@@ -34,26 +35,13 @@ List<SingleChildWidget> appProviders({required LocalStorage storage}) => [
     dispose: (_, client) => client.dispose(),
   ),
 
-  // Feature controllers
-  ChangeNotifierProvider<AuthController>(
-    create: (context) => AuthController(
-      repository: AuthRepositoryImpl(
-        remoteSource: AuthRemoteSourceImpl(client: context.read<ApiClient>()),
-        localSource: AuthLocalSourceImpl(storage: context.read<LocalStorage>()),
-        connectivity: context.read<ConnectivityChecker>(),
-      ),
-      eventBus: context.read<EventBus>(),
-    ),
-  ),
-  ChangeNotifierProvider<ProfileController>(
-    create: (context) => ProfileController(
-      repository: ProfileRepositoryImpl(
-        remoteSource: ProfileRemoteSourceImpl(
-          client: context.read<ApiClient>(),
-        ),
-        localSource: ProfileLocalSourceImpl(
-          storage: context.read<LocalStorage>(),
-        ),
+  // ─── Feature controllers ─────────────────────────────────────────
+  // Example: Post feature (delete this and add your own features)
+  ChangeNotifierProvider<PostController>(
+    create: (context) => PostController(
+      repository: PostRepositoryImpl(
+        remoteSource: PostRemoteSourceImpl(client: context.read<ApiClient>()),
+        localSource: PostLocalSourceImpl(storage: context.read<LocalStorage>()),
         connectivity: context.read<ConnectivityChecker>(),
       ),
       eventBus: context.read<EventBus>(),
