@@ -11,6 +11,7 @@ import '../repository/post_repository.dart';
 /// - All three data strategies (localFirst, staleWhileRevalidate, remoteFirst)
 /// - EventBus integration (subscribing + publishing)
 /// - BaseController state management (isLoading, isRefreshing, hasError)
+/// - Optional NotificationService for automatic error snackbars
 class PostController extends BaseController {
   final PostRepository _repository;
   final EventBus _eventBus;
@@ -20,6 +21,7 @@ class PostController extends BaseController {
   PostController({
     required PostRepository repository,
     required EventBus eventBus,
+    super.notificationService,
   }) : _repository = repository,
        _eventBus = eventBus {
     // Example: react to app-wide cache clear event

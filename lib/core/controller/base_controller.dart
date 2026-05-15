@@ -2,11 +2,22 @@ import 'package:flutter/foundation.dart';
 
 import '../errors/app_exception.dart';
 import '../network/data_strategy.dart';
+import '../notification/app_notification.dart';
+import '../notification/notification_service.dart';
 import '../result/result.dart';
 
 /// Base controller that provides common state management patterns.
 /// Extend this to avoid repeating isLoading/error boilerplate in every controller.
+///
+/// Optionally accepts a [NotificationService] to automatically show
+/// notifications on errors. If not provided, errors are only available
+/// via [hasError] / [errorMessage] state (the view decides how to display them).
 abstract class BaseController extends ChangeNotifier {
+  final NotificationService? _notificationService;
+
+  BaseController({NotificationService? notificationService})
+    : _notificationService = notificationService;
+
   bool _isLoading = false;
   bool _isRefreshing = false;
   AppException? _error;
@@ -29,6 +40,19 @@ abstract class BaseController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Manually push a notification (success, info, warning, or error).
+  /// Only works if a [NotificationService] was provided.
+  @protected
+  void notify(AppNotification notification) {
+    _notificationService?.show(notification);
+  }
+
+  /// Internal helper — sets error state and optionally shows a notification.
+  void _setError(AppException error) {
+    _error = error;
+    _notificationService?.show(AppNotification.error(error.message));
+  }
+
   /// Execute an async action with automatic loading/error state management.
   @protected
   Future<void> execute(Future<void> Function() action) async {
@@ -39,7 +63,7 @@ abstract class BaseController extends ChangeNotifier {
     try {
       await action();
     } catch (e) {
-      _error = e is AppException ? e : AppException(message: e.toString());
+      _setError(e is AppException ? e : AppException(message: e.toString()));
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -95,10 +119,10 @@ abstract class BaseController extends ChangeNotifier {
       final result = await action();
       result.when(
         success: (data) => onSuccess(data),
-        failure: (error) => _error = error,
+        failure: (error) => _setError(error),
       );
     } catch (e) {
-      _error = e is AppException ? e : AppException(message: e.toString());
+      _setError(e is AppException ? e : AppException(message: e.toString()));
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -130,10 +154,10 @@ abstract class BaseController extends ChangeNotifier {
       final freshResult = await freshAction();
       freshResult.when(
         success: (data) => onSuccess(data),
-        failure: (error) => _error = error,
+        failure: (error) => _setError(error),
       );
     } catch (e) {
-      _error = e is AppException ? e : AppException(message: e.toString());
+      _setError(e is AppException ? e : AppException(message: e.toString()));
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -174,12 +198,12 @@ abstract class BaseController extends ChangeNotifier {
         failure: (error) {
           // Only set error if we had no cache data
           if (cacheResult.isFailure) {
-            _error = error;
+            _setError(error);
           }
         },
       );
     } catch (e) {
-      _error = e is AppException ? e : AppException(message: e.toString());
+      _setError(e is AppException ? e : AppException(message: e.toString()));
     } finally {
       _isLoading = false;
       _isRefreshing = false;
@@ -210,10 +234,10 @@ abstract class BaseController extends ChangeNotifier {
       final cacheResult = await cacheAction();
       cacheResult.when(
         success: (data) => onSuccess(data),
-        failure: (_) => _error = freshResult.exception,
+        failure: (_) => _setError(freshResult.exception),
       );
     } catch (e) {
-      _error = e is AppException ? e : AppException(message: e.toString());
+      _setError(e is AppException ? e : AppException(message: e.toString()));
     } finally {
       _isLoading = false;
       notifyListeners();
