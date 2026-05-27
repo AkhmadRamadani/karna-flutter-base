@@ -1,0 +1,162 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "title": "Getting Started with Flutter",
+      "body": "Flutter is Google's UI toolkit for building natively compiled applications for mobile, web, and desktop from a single codebase. In this post, we'll explore the basics of Flutter development and how to set up your first project.",
+      "author_id": "user_1"
+    },
+    {
+      "id": "2",
+      "title": "Understanding State Management",
+      "body": "State management is one of the most important concepts in Flutter. Whether you use Provider, Riverpod, or BLoC, understanding how state flows through your app is crucial for building maintainable applications.",
+      "author_id": "user_2"
+    },
+    {
+      "id": "3",
+      "title": "Building Offline-First Apps",
+      "body": "Offline-first architecture ensures your app works seamlessly without internet. By caching data locally and syncing when connectivity returns, you provide a reliable experience regardless of network conditions.",
+      "author_id": "user_1"
+    },
+    {
+      "id": "4",
+      "title": "Dart Null Safety Deep Dive",
+      "body": "Null safety in Dart eliminates null reference exceptions at compile time. Learn how to leverage sound null safety, use late variables wisely, and handle nullable types effectively in your Flutter projects.",
+      "author_id": "user_3"
+    },
+    {
+      "id": "5",
+      "title": "Performance Optimization Tips",
+      "body": "Keeping your Flutter app performant requires attention to widget rebuilds, image caching, and lazy loading. This post covers practical techniques to maintain 60fps even in complex UIs.",
+      "author_id": "user_2"
+    },
+    {
+      "id": "6",
+      "title": "Testing Strategies for Flutter",
+      "body": "A solid testing strategy includes unit tests for business logic, widget tests for UI components, and integration tests for full user flows. We'll walk through setting up each layer with practical examples.",
+      "author_id": "user_3"
+    },
+    {
+      "id": "7",
+      "title": "Custom Animations in Flutter",
+      "body": "Flutter's animation framework is powerful and flexible. From implicit animations to custom AnimationControllers, learn how to create smooth, delightful transitions that enhance your app's user experience.",
+      "author_id": "user_1"
+    },
+    {
+      "id": "8",
+      "title": "Dependency Injection Patterns",
+      "body": "Clean architecture depends on proper dependency injection. Explore how to structure your DI layer using Provider, get_it, or manual injection to keep your codebase testable and maintainable.",
+      "author_id": "user_2"
+    },
+    {
+      "id": "9",
+      "title": "Working with REST APIs",
+      "body": "Connecting your Flutter app to a REST API involves HTTP clients, JSON serialization, error handling, and retry logic. This guide covers building a robust networking layer from scratch.",
+      "author_id": "user_3"
+    },
+    {
+      "id": "10",
+      "title": "Flutter for Production",
+      "body": "Taking a Flutter app to production requires crash reporting, analytics, CI/CD pipelines, and proper release management. Learn the essential steps to ship with confidence.",
+      "author_id": "user_1"
+    }
+  ],
+  "feeds": [
+    {
+      "id": "1",
+      "author_name": "Sarah Chen",
+      "content": "Just shipped a new feature using the Karna MVC architecture. The separation of concerns makes it so easy to test each layer independently. Highly recommend this pattern for medium-to-large Flutter apps!",
+      "image_url": "https://picsum.photos/seed/feed1/600/400",
+      "created_at": "2025-05-15T09:30:00.000Z",
+      "like_count": 42
+    },
+    {
+      "id": "2",
+      "author_name": "Marcus Johnson",
+      "content": "Memory management in mobile apps is underrated. Your app might work fine in development but crash in production when users have 50 apps open. Always think about resource cleanup!",
+      "image_url": null,
+      "created_at": "2025-05-15T08:15:00.000Z",
+      "like_count": 28
+    },
+    {
+      "id": "3",
+      "author_name": "Aiko Tanaka",
+      "content": "TIL: Flutter's didHaveMemoryPressure callback is your best friend for graceful degradation. Combined with a priority-based service manager, you can keep your app responsive even under heavy memory pressure.",
+      "image_url": "https://picsum.photos/seed/feed3/600/400",
+      "created_at": "2025-05-14T22:45:00.000Z",
+      "like_count": 67
+    },
+    {
+      "id": "4",
+      "author_name": "David Park",
+      "content": "Offline-first is not optional anymore. Users expect apps to work in elevators, subways, and rural areas. Cache aggressively, sync lazily.",
+      "image_url": null,
+      "created_at": "2025-05-14T18:20:00.000Z",
+      "like_count": 91
+    },
+    {
+      "id": "5",
+      "author_name": "Elena Rodriguez",
+      "content": "Refactored our entire networking layer today. Went from scattered try-catch blocks to a clean Result<T> type. Zero uncaught exceptions in production since the switch. The type system is your ally!",
+      "image_url": "https://picsum.photos/seed/feed5/600/400",
+      "created_at": "2025-05-14T14:00:00.000Z",
+      "like_count": 55
+    },
+    {
+      "id": "6",
+      "author_name": "Sarah Chen",
+      "content": "Pro tip: Use stale-while-revalidate for feeds and dashboards. Show cached data instantly, refresh in the background. Users perceive the app as lightning fast.",
+      "image_url": null,
+      "created_at": "2025-05-14T10:30:00.000Z",
+      "like_count": 73
+    },
+    {
+      "id": "7",
+      "author_name": "Marcus Johnson",
+      "content": "Just discovered that our image cache was holding 200MB in memory. Added a MemoryAwareController with ServicePriority.low and now it auto-trims when the system needs resources. Beautiful.",
+      "image_url": "https://picsum.photos/seed/feed7/600/400",
+      "created_at": "2025-05-13T20:15:00.000Z",
+      "like_count": 38
+    },
+    {
+      "id": "8",
+      "author_name": "Aiko Tanaka",
+      "content": "The EventBus pattern is perfect for cross-feature communication without coupling. User logs out? Fire an event. Profile updated? Fire an event. No imports between features needed.",
+      "image_url": null,
+      "created_at": "2025-05-13T16:45:00.000Z",
+      "like_count": 44
+    },
+    {
+      "id": "9",
+      "author_name": "David Park",
+      "content": "Testing tip: InMemoryStorage makes widget tests fast and deterministic. No Hive initialization, no SharedPreferences mocking. Just pure in-memory operations.",
+      "image_url": "https://picsum.photos/seed/feed9/600/400",
+      "created_at": "2025-05-13T12:00:00.000Z",
+      "like_count": 29
+    },
+    {
+      "id": "10",
+      "author_name": "Elena Rodriguez",
+      "content": "Shipped v2.0 today! The Karna architecture made it possible to add 5 new features in 3 weeks without touching existing code. Each feature is its own self-contained module.",
+      "image_url": "https://picsum.photos/seed/feed10/600/400",
+      "created_at": "2025-05-12T09:00:00.000Z",
+      "like_count": 112
+    },
+    {
+      "id": "11",
+      "author_name": "Sarah Chen",
+      "content": "Reminder: Controllers should never import package:flutter/widgets.dart. Keep them as pure Dart — it makes unit testing trivial and keeps business logic framework-agnostic.",
+      "image_url": null,
+      "created_at": "2025-05-12T07:30:00.000Z",
+      "like_count": 61
+    },
+    {
+      "id": "12",
+      "author_name": "Marcus Johnson",
+      "content": "DataStrategy.remoteFirst for payments. DataStrategy.localFirst for user profiles. DataStrategy.staleWhileRevalidate for feeds. Choose the right strategy for each use case.",
+      "image_url": null,
+      "created_at": "2025-05-11T21:00:00.000Z",
+      "like_count": 85
+    }
+  ]
+}

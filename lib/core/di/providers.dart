@@ -3,6 +3,7 @@ import 'package:provider/single_child_widget.dart';
 
 import '../config/app_config.dart';
 import '../events/event_bus.dart';
+import '../memory/memory_manager.dart';
 import '../network/api_client.dart';
 import '../network/connectivity_checker.dart';
 import '../storage/local_storage.dart';
@@ -11,6 +12,10 @@ import '../../features/post/controller/post_controller.dart';
 import '../../features/post/repository/post_repository_impl.dart';
 import '../../features/post/repository/data_source/post_remote_source.dart';
 import '../../features/post/repository/data_source/post_local_source.dart';
+import '../../features/feed/controller/feed_controller.dart';
+import '../../features/feed/repository/feed_repository_impl.dart';
+import '../../features/feed/repository/data_source/feed_remote_source.dart';
+import '../../features/feed/repository/data_source/feed_local_source.dart';
 
 /// All feature providers wired together.
 /// Receives [AppDependencies] initialized in main().
@@ -30,6 +35,13 @@ List<SingleChildWidget> appProviders({
     create: (_) => EventBusImpl(),
     dispose: (_, bus) => bus.dispose(),
   ),
+  ProxyProvider<EventBus, MemoryManager>(
+    update: (_, eventBus, previous) {
+      previous?.dispose();
+      return MemoryManager(eventBus: eventBus);
+    },
+    dispose: (_, manager) => manager.dispose(),
+  ),
   ProxyProvider<AppConfig, ApiClient>(
     update: (_, config, previous) {
       previous?.dispose();
@@ -48,6 +60,17 @@ List<SingleChildWidget> appProviders({
         connectivity: context.read<ConnectivityChecker>(),
       ),
       eventBus: context.read<EventBus>(),
+      notificationService: dependencies.notificationService,
+    ),
+  ),
+  ChangeNotifierProvider<FeedController>(
+    create: (context) => FeedController(
+      memoryManager: context.read<MemoryManager>(),
+      repository: FeedRepositoryImpl(
+        remoteSource: FeedRemoteSourceImpl(client: context.read<ApiClient>()),
+        localSource: FeedLocalSourceImpl(storage: context.read<LocalStorage>()),
+        connectivity: context.read<ConnectivityChecker>(),
+      ),
       notificationService: dependencies.notificationService,
     ),
   ),

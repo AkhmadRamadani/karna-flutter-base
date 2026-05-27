@@ -9,11 +9,11 @@ import 'dart:async';
 /// Usage:
 /// ```dart
 /// // Publishing (in a controller or repository):
-/// eventBus.fire(UserLoggedOutEvent());
+/// eventBus.fire(CacheClearedEvent());
 ///
 /// // Subscribing (in a controller's constructor or init):
-/// _subscription = eventBus.on<UserLoggedOutEvent>().listen((_) {
-///   clearLocalData();
+/// _subscription = eventBus.on<CacheClearedEvent>().listen((_) {
+///   reloadData();
 /// });
 /// ```
 abstract class EventBus {
