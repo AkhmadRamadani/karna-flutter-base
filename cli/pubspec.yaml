@@ -1,0 +1,14 @@
+name: karna_cli
+description: CLI tool to create and manage Karna MVC Flutter projects.
+version: 1.0.0
+repository: https://github.com/AkhmadRamadani/karna-flutter-base
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  args: ^2.4.2
+  path: ^1.8.3
+
+executables:
+  karna: karna

@@ -1,31 +1,74 @@
 # Karna MVC
 
-A feature-first Model-View-Controller starter template for Flutter with typed error handling, pluggable data strategies, storage-agnostic caching, and event-driven cross-feature communication. Each feature is self-contained and depends on nothing outside itself except `core/`.
+A feature-first Model-View-Controller architecture for Flutter with typed error handling, pluggable data strategies, memory management, storage-agnostic caching, and event-driven cross-feature communication.
 
 > Named after Karna of the Mahabharata: a warrior complete in himself.
 > In Indonesian: *karena* (because of) — every layer exists because of its feature.
 
-This is a **starter project** — not a package. Clone it, delete the example `post` feature, and start building your own features using the same patterns.
+---
+
+## Installation
+
+### Option A: Dart CLI (recommended)
+
+Install globally via `dart pub global activate` — works on all platforms:
+
+```bash
+# From the cli/ directory of this repo (or publish to pub.dev)
+dart pub global activate --source path ./cli
+
+# Or once published to pub.dev:
+# dart pub global activate karna_cli
+```
+
+Then use from anywhere:
+
+```bash
+karna create my_app
+karna create my_app --org com.mycompany
+karna feature auth
+karna feature feed --memory-aware
+```
+
+### Option B: Shell script (macOS/Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AkhmadRamadani/karna-flutter-base/main/scripts/create_project.sh -o /usr/local/bin/karna
+chmod +x /usr/local/bin/karna
+
+karna my_app
+```
+
+### Option C: Clone the template
+
+```bash
+git clone https://github.com/AkhmadRamadani/karna-flutter-base.git my_app
+cd my_app
+rm -rf .git
+git init
+flutter pub get
+```
+
+---
 
 ## Quick Start
 
 ```bash
-# Clone and rename
-git clone <this-repo> my_app
+# Create a new project
+karna my_app
 cd my_app
 
-# Install dependencies
-flutter pub get
-
-# Run the example
-flutter run
-
 # Create your first feature
-./scripts/create_feature.sh my_feature
+./scripts/create_feature.sh auth
 
-# Then delete the example feature when you're ready
-rm -rf lib/features/post test/features/post
+# Run the app
+flutter run --dart-define=BASE_URL=http://localhost:8080/api
+
+# Run tests
+flutter test
 ```
+
+---
 
 ## Project Structure
 
@@ -40,11 +83,17 @@ lib/
 │   ├── events/
 │   │   ├── event_bus.dart                # Abstract EventBus + stream impl
 │   │   └── app_events.dart              # Typed app-wide event classes
-│   ├── extensions/                       # Dart extension methods
+│   ├── memory/
+│   │   ├── memory_manager.dart           # Service lifecycle manager
+│   │   ├── memory_aware_controller.dart  # BaseController + memory management
+│   │   ├── managed_service.dart          # Interface for managed services
+│   │   ├── memory_events.dart            # Memory pressure events
+│   │   └── service_priority.dart         # Priority levels + pressure enum
 │   ├── network/
 │   │   ├── api_client.dart               # HTTP client with retry & auth
 │   │   ├── connectivity_checker.dart     # Network availability check
 │   │   └── data_strategy.dart            # DataStrategy enum
+│   ├── notification/                     # SnackBar notification service
 │   ├── result/result.dart                # Sealed Result<T> (Success/Failure)
 │   ├── routes/app_routes.dart            # Centralized routing
 │   ├── storage/
@@ -53,93 +102,62 @@ lib/
 │   │   ├── shared_prefs_storage.dart     # Small key-value
 │   │   └── hive_storage.dart             # Larger datasets
 │   ├── theme/app_theme.dart              # Light & dark theme
-│   ├── utils/                            # Pure utility functions
 │   └── widgets/                          # Shared widgets (2+ features)
 │
 ├── features/
 │   └── <feature>/
 │       ├── model/<feature>_model.dart
 │       ├── repository/
-│       │   ├── <feature>_repository.dart          # Abstract (returns Result<T>)
-│       │   ├── <feature>_repository_impl.dart     # Local + remote orchestration
+│       │   ├── <feature>_repository.dart
+│       │   ├── <feature>_repository_impl.dart
 │       │   └── data_source/
-│       │       ├── <feature>_remote_source.dart   # HTTP via ApiClient
-│       │       └── <feature>_local_source.dart    # Cache via LocalStorage
-│       ├── controller/<feature>_controller.dart   # Extends BaseController
-│       └── view/
-│           ├── <feature>_view.dart
-│           └── widgets/
+│       │       ├── <feature>_remote_source.dart
+│       │       └── <feature>_local_source.dart
+│       ├── controller/<feature>_controller.dart
+│       └── view/<feature>_view.dart
 │
-test/
-└── features/
-    └── <feature>/
-        ├── <feature>_controller_test.dart
-        ├── <feature>_repository_test.dart
-        └── <feature>_view_test.dart
+scripts/
+├── create_project.sh                     # Initialize a new Karna MVC project
+└── create_feature.sh                     # Scaffold a new feature
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## CLI Commands
 
-- Flutter SDK `^3.11.5`
-- Dart SDK (bundled with Flutter)
-
-### Install dependencies
+### Create a new project
 
 ```bash
-flutter pub get
+karna create <project_name> [--org com.example]
 ```
 
-### Run the app
+This will:
+1. Run `flutter create` with your project name
+2. Add all required dependencies (provider, http, hive, shared_preferences)
+3. Scaffold the full `core/` architecture with memory management
+4. Set up a clean `main.dart` with Hive, notifications, and MultiProvider
+5. Remove the default counter app
+
+### Create a new feature
 
 ```bash
-# Development (default — uses localhost)
-flutter run
-
-# With custom environment
-flutter run --dart-define=BASE_URL=https://api.example.com --dart-define=ENV=staging
+karna feature <feature_name>
+karna feature <feature_name> --memory-aware
 ```
 
-### Run tests
-
-```bash
-flutter test
-```
-
-### Analyze
-
-```bash
-flutter analyze
-```
-
-## Creating a New Feature
-
-Use the generator script to scaffold a complete feature in one command:
-
-```bash
-./scripts/create_feature.sh <feature_name>
-```
+Options:
+- `--memory-aware` / `-m` — Use `MemoryAwareController` instead of `BaseController`
 
 Example:
 
 ```bash
-./scripts/create_feature.sh payment
-./scripts/create_feature.sh order_history
+karna feature payment
+karna feature feed --memory-aware
 ```
 
-This creates all files following the Karna MVC pattern and registers the controller in `core/di/providers.dart` automatically. Generated features include:
-- `Result<T>` returns from repositories
-- Local-first data strategy with connectivity checks
-- `BaseController` with `DataStrategy` support
-- Remote source using `ApiClient`
-- Local source using `LocalStorage`
-- Full test suite (controller, repository, view)
+This creates all files following the Karna MVC pattern and registers the controller in `core/di/providers.dart` automatically.
 
-You can also run it from VS Code:
-1. `Cmd+Shift+P` → "Run Task"
-2. Select **"Karna: Create Feature"**
-3. Enter the feature name in `snake_case`
+---
 
 ## Core Concepts
 
@@ -151,16 +169,16 @@ Repositories return `Result<T>` instead of throwing exceptions:
 final result = await repository.getById(id);
 result.when(
   success: (data) => _user = data,
-  failure: (error) => _error = error,  // Typed AppException
+  failure: (error) => _error = error,
 );
 ```
 
 ### Data Strategy
 
-Controllers declare how data is loaded via `DataStrategy`:
+Controllers declare how data is loaded:
 
 ```dart
-// Default — cache first, network on miss
+// Cache first, network on miss
 await controller.loadPosts();
 
 // Show stale cache immediately, refresh in background
@@ -170,79 +188,98 @@ await controller.loadPosts(strategy: DataStrategy.staleWhileRevalidate);
 await controller.loadPosts(strategy: DataStrategy.remoteFirst);
 ```
 
-### BaseController
+### Memory Management
 
-All controllers extend `BaseController` which provides:
-- `isLoading` — true during initial load
-- `isRefreshing` — true during background refresh
-- `hasError` / `errorMessage` — typed error state
-- `load(strategy:)` — unified data loading with strategy
-- `executeResult()` — shorthand for single actions
+Services and controllers participate in automatic memory management based on priority:
+
+| Priority | Behavior |
+|----------|----------|
+| `critical` | Never killed — auth, storage, navigation |
+| `high` | Only killed when device is out of memory |
+| `normal` | Killed under moderate memory pressure |
+| `low` | Auto-killed when idle (5 min default) |
+
+Extend `MemoryAwareController` instead of `BaseController` for managed controllers:
+
+```dart
+class FeedController extends MemoryAwareController {
+  FeedController({required super.memoryManager, required FeedRepository repository})
+      : super(servicePriority: ServicePriority.normal);
+
+  @override
+  String get serviceId => 'feed';
+
+  @override
+  bool get isActive => _items.isNotEmpty;
+
+  @override
+  Future<void> onMemoryWarning() async => _trimToRecent(20);
+
+  @override
+  Future<void> onKill() async { _items.clear(); notifyListeners(); }
+
+  @override
+  Future<void> onRevive() async => loadFeed();
+}
+```
+
+### Event Bus
+
+Cross-feature communication without coupling:
+
+```dart
+// Fire from any controller
+eventBus.fire(const CacheClearedEvent());
+
+// Listen in another controller
+_sub = eventBus.on<CacheClearedEvent>().listen((_) => reload());
+```
 
 ### Storage-Agnostic Caching
 
-A single `LocalStorage` interface backs all features. Swap the implementation in one line:
+Swap the storage backend in one line — all features follow automatically:
 
 ```dart
-// In providers.dart — change backend for entire app:
 Provider<LocalStorage>(create: (_) => HiveStorage(box: box)),
 // or: InMemoryStorage(), SharedPrefsStorage(prefs: prefs)
 ```
 
-### API Client
+---
 
-Shared HTTP client with:
-- Base URL from `AppConfig` (environment-aware)
-- Auth token injection
-- Retry logic (2 retries with backoff)
-- Typed error mapping (401 → `ServerException`, no network → `NetworkException`)
+## Running with Environments
 
-### Connectivity Awareness
+```bash
+# Development (default)
+flutter run
 
-Repositories check network before remote calls and return typed `NetworkException` failures, allowing the UI to show appropriate offline states.
+# Staging
+flutter run --dart-define=BASE_URL=https://api.staging.com --dart-define=ENV=staging
 
-### Event Bus (Cross-Feature Notifications)
-
-Features never import each other — but sometimes one feature needs to react when something happens in another. The `EventBus` solves this with typed, fire-and-forget events:
-
-```dart
-// Publishing — fire an event from any controller:
-_eventBus.fire(const CacheClearedEvent());
-
-// Subscribing — react in another controller without importing the publisher:
-_cacheSub = _eventBus.on<CacheClearedEvent>().listen((_) {
-  _posts = [];
-  notifyListeners();
-});
+# Production
+flutter run --dart-define=BASE_URL=https://api.prod.com --dart-define=ENV=production
 ```
 
-Built-in events: `UserLoggedInEvent`, `UserLoggedOutEvent`, `SessionExpiredEvent`, `UserProfileUpdatedEvent`, `ConnectivityChangedEvent`, `CacheClearedEvent`.
+---
 
-Add custom events by extending `AppEvent` in `core/events/app_events.dart`. The event bus is injected via constructor — fully mockable in tests.
+## Mock Server
 
-## Example Feature: Post
+A local JSON mock server is included in `mock_server/` for development:
 
-The project ships with a single `post` feature that demonstrates the full pattern end-to-end. Use it as a reference, then delete it when you start building your own features.
+```bash
+# Install json-server (one-time)
+npm install -g json-server@0.17.4
 
-```
-lib/features/post/
-├── model/post_model.dart                    # Immutable model with fromJson/toJson/copyWith
-├── repository/
-│   ├── post_repository.dart                 # Abstract interface (returns Result<T>)
-│   ├── post_repository_impl.dart            # Orchestrates local + remote + connectivity
-│   └── data_source/
-│       ├── post_remote_source.dart          # HTTP via ApiClient
-│       └── post_local_source.dart           # Cache via LocalStorage
-├── controller/post_controller.dart          # All 3 data strategies + EventBus
-└── view/post_view.dart                      # Uses shared widgets, pull-to-refresh
+# Run
+cd mock_server
+json-server --watch db.json --routes routes.json --port 8080
+
+# Connect your app
+flutter run --dart-define=BASE_URL=http://localhost:8080/api
 ```
 
-The example demonstrates:
-- All three `DataStrategy` modes in the controller
-- `EventBus` subscription (reacts to `CacheClearedEvent`)
-- Proper `dispose()` with subscription cleanup
-- View using `LoadingIndicator`, `ErrorDisplay`, and `RefreshIndicator`
-- Full test coverage (controller, repository, view)
+For Android emulator, use `http://10.0.2.2:8080/api` instead.
+
+---
 
 ## Architecture Rules
 
@@ -250,25 +287,24 @@ The example demonstrates:
 |------|-----------|
 | One feature folder per product feature | Co-located and deletable as a unit |
 | Features never import other features | Cross-feature coupling resolved in `core/di/` |
-| Controllers extend `BaseController` | Shared loading/error/strategy patterns |
+| Controllers extend `BaseController` or `MemoryAwareController` | Shared patterns |
 | Repositories return `Result<T>` | Typed errors, no uncaught exceptions |
-| Repositories expose `getFromCache` + `getFromRemote` | Enables all three data strategies |
-| Views contain zero business logic | Only UI logic (animations, layout) |
-| Remote sources use `ApiClient` | Centralized HTTP, auth, retries |
-| Local sources use `LocalStorage` | Storage-agnostic, swappable backend |
-| Models are immutable (`final` + `copyWith`) | Predictable state |
+| Views contain zero business logic | Only UI logic |
 | All dependencies injected via constructor | No hidden singletons, fully mockable |
 | Shared code moves to `core/` only when used by 2+ features | No premature abstraction |
+
+---
 
 ## Key Packages
 
 | Package | Role |
 |---------|------|
-| `provider` | DI + state propagation to the widget tree |
-| `http` | HTTP client (used by ApiClient) |
-| `hive` / `hive_flutter` | Fast local storage backend |
-| `shared_preferences` | Simple key-value storage backend |
-| `flutter_test` | Widget and unit testing |
+| `provider` | DI + state propagation |
+| `http` | HTTP client |
+| `hive_ce` / `hive_ce_flutter` | Fast local storage |
+| `shared_preferences` | Simple key-value storage |
+
+---
 
 ## Further Reading
 
